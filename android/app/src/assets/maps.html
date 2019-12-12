@@ -1,0 +1,530 @@
+<!-- <!doctype html>
+<html>
+ 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+        <title>手机定位</title>
+        <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css" />
+        <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.4&key=ad26780bfaabf0ca27ae6078e2e81682"></script>
+        <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+        <style>
+          #container{
+              width:100%;
+              height:100%;
+              overflow: hidden;
+          }
+        </style>
+        <body>
+            
+            <div id='container'></div>
+           
+            <div id="tip"></div>
+            <script type="text/javascript">
+                var pointList=[{longitude:116.397428,latitude:39.90923},
+                {longitude:116.397428,latitude:39.90923},
+                {longitude:116.397428,latitude:39.90923},
+                {longitude:116.397428,latitude:39.90923}
+            ]
+
+                /***************************************
+                    由于Chrome、IOS10等已不再支持非安全域的浏览器定位请求，为保证定位成功率和精度，请尽快升级您的站点到HTTPS。
+                    ***************************************/
+                var map, geolocation,pointList;  //data为所有坐标的集合
+                var a_mark;    //图标点
+                var marker;  
+                var lineArr;
+                //加载地图，调用浏览器定位服务
+                map = new AMap.Map('container', {
+                    resizeEnable: true
+                });
+                map.plugin('AMap.Geolocation', function() {
+                    geolocation = new AMap.Geolocation({
+                        enableHighAccuracy: true, //是否使用高精度定位，默认:true
+                        timeout: 10000, //超过10秒后停止定位，默认：无穷大
+                        buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                        zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                        buttonPosition: 'RB'
+                    });
+                    map.addControl(geolocation);
+                    geolocation.getCurrentPosition();
+                    AMap.event.addListener(geolocation, 'complete', onComplete); //返回定位信息
+                    AMap.event.addListener(geolocation, 'error', onError); //返回定位出错信息
+                });
+                //地图图块加载完毕后执行函数  
+                function completeEventHandler(pointList){ 
+                    // alert(x)
+                    // 创建 AMap.Icon 实例：
+                    
+                    var icon = new AMap.Icon({
+                        size: new AMap.Size(40, 50),    // 图标尺寸
+                        image: 'https://webapi.amap.com/theme/v1.3/images/newpc/way_btn2.png',  // Icon的图像
+                        imageOffset: new AMap.Pixel(0, -60),  // 图像相对展示区域的偏移量，适于雪碧图等
+                        imageSize: new AMap.Size(40, 50)   // 根据所设置的大小拉伸或压缩图片
+                    });
+                    marker3 = new AMap.Marker({  
+                        
+                        map:map,  
+                        //draggable:true, //是否可拖动  
+                        position:new AMap.LngLat(x,y),//基点位置  
+                        icon: icon, // 添加 Icon 实例
+                        // offset:new AMap.Pixel(-26,-13), //相对于基点的位置  
+                        offset: new AMap.Pixel(-10, -10),
+                        autoRotation:true,
+                        zoom: 13  
+                    });        
+                    var lngX ;  
+                    var latY ;         
+                    lineArr = new Array();   
+
+                    for(var i = 1;i<pointList.length;i++){
+                        lngX = pointList[i].longitude; //纬度
+                        latY = pointList[i].latitude; //经度
+                        lineArr.push(new AMap.LngLat(lngX,latY));
+                    }
+                    //绘制轨迹  
+                    var polyline = new AMap.Polyline({  
+                        map:map,  
+                        path:lineArr,  
+                        strokeColor:"#00A",//线颜色  
+                        strokeOpacity:1,//线透明度  
+                        strokeWeight:3,//线宽  
+                        strokeStyle:"solid",//线样式  
+                    });  
+                }
+                function startRun(){  //开始绘制轨迹
+                    x=pointList[0].longitude;
+                    y=pointList[0].latitude;
+                    completeEventHandler(x,y);
+                    // marker.moveAlong(lineArr,80);     //开始轨迹回放
+                }
+                //解析定位结果
+                function onComplete(data) {
+                    var str = [];
+                    str.push(data.position.getLat()); //纬度
+                    str.push(data.position.getLng());   //经度
+                    document.getElementById('tip').innerHTML = str;
+                    console.log(str)
+                    
+                    // 发送消息
+                    if(window.ReactNativeWebView){
+                        window.ReactNativeWebView.postMessage(JSON.stringify(str))
+                    }
+
+                    
+                }
+                
+                //解析定位错误信息
+                function onError(data) {
+                    document.getElementById('tip').innerHTML = '定位失败';
+                
+                }
+                // 解析url参数
+                function getQueryVariable(variable)
+                    {
+                        var query = window.location.search.substring(1);
+                        var vars = query.split("&");
+                        for (var i=0;i<vars.length;i++) {
+                                var pair = vars[i].split("=");
+                                if(pair[0] == variable){return pair[1];}
+                        }
+                        return(false);
+                    }
+                /**
+                 * 监听RN webview 发送到 html5 的消息   
+                 */
+                window.onload = function(){
+                    // pointList = JSON.parse(decodeURIComponent(getQueryVariable('data')))
+                    // alert(JSON.stringify(pointList))
+                    startRun()     
+                    // completeEventHandler(pointList)
+                }    
+            </script>
+        </body>
+</html> -->
+
+
+<!-- 测试 -->
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>节点跟踪</title>
+
+    <style>
+        html,body,#container{width:100%;height:100%; margin:0;overflow: hidden;}
+
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=ad26780bfaabf0ca27ae6078e2e81682&plugin=AMap.Driving,AMap.Geocoder,AMap.TruckDriving"></script> 
+ 
+    <script>
+        function markLocation(mapId, address) {
+              AMap.plugin('AMap.Geocoder', function() {
+                    var geocoder = new AMap.Geocoder();            
+                    geocoder.getLocation(address, function(status, result) {
+                        if (status === 'complete' && result.info === 'OK') {
+
+                            // 经纬度                      
+                            var lng = result.geocodes[0].location.lng;
+                            var lat = result.geocodes[0].location.lat;
+
+                            // 地图实例
+                            var map = new AMap.Map(mapId, {
+                                viewMode:'3D',
+                                resizeEnable: true, // 允许缩放
+                                center: [lng, lat], // 设置地图的中心点
+                                zoom: 15 　　　　　　 // 设置地图的缩放级别，0 - 20
+                            });
+                            // 车辆信息
+                            var truckDriving = new AMap.TruckDriving({
+                                policy: 0, // 规划策略
+                                size: 1, // 车型大小
+                                width: 2.5, // 宽度
+                                height: 2, // 高度      
+                                load: 1, // 载重
+                                weight: 12, // 自重
+                                axlesNum: 2, // 轴数
+                                province: '粤', // 车辆牌照省份
+                            })
+                            var path = []
+                            path.push({lnglat:[lng, lat]});//起点
+                            path.push({lnglat:[113.758373,23.027259]});//途径
+                            path.push({lnglat:[116.205467, 39.907761]});
+                            path.push({lnglat:[116.368904, 39.913423]});
+                            path.push({lnglat:[116.305467, 39.807761]});
+                            // path.push({lnglat:[116.378506,23.555724]});//途径
+                            path.push({lnglat:[114.03,22.66]});//终点
+                            let approach = path.slice(1,path.length-1);
+                            truckDriving.search(path, function(status, result) {
+                                // result即是对应的货车导航信息，相关数据结构文档请参考 https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+                                if (status === 'complete') {
+                                    // log.success('绘制货车路线完成')
+
+                                    if (result.routes && result.routes.length) {
+                                        drawRoute(result.routes[0]) 
+                                    }
+                                } else {
+                                    // log.error('获取货车规划数据失败：' + result)
+                                }
+                            })
+                            function drawRoute (route) {
+                                var path = parseRouteToPath(route)
+                                // 起始路径
+                                var startMarker = new AMap.Marker({
+                                    position: path[0],
+                                    icon: 'https://webapi.amap.com/theme/v1.3/markers/n/start.png',
+                                    map: map
+                                })
+                                // 结束路径
+                                var endMarker = new AMap.Marker({
+                                    position: path[path.length - 1],
+                                    icon: 'https://webapi.amap.com/theme/v1.3/markers/n/end.png',
+                                    map: map
+                                })
+                                endMarker.setTitle('我是endMarker的标识');
+                                // 中途路径icon设置
+                                var viaMarkericon = new AMap.Icon({
+                                    // 图标尺寸
+                                    size: new AMap.Size(25, 34),
+                                    // 图标的取图地址
+                                    image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+                                    // 图标所用图片大小
+                                    imageSize: new AMap.Size(135, 40),
+                                    // 图标取图偏移量
+                                    imageOffset: new AMap.Pixel(-52, -3)
+                                });
+                                // 添加途径表示
+                                approach.forEach(function(marker,index){
+                                    let viaMarker = new AMap.Marker({
+                                        position:[marker.lnglat.lng,marker.lnglat.lat],
+                                        icon: viaMarkericon,
+                                        map: map,
+                                        offset: new AMap.Pixel(-13, -30)
+                                    });
+                                })
+                                
+                                
+                                var routeLine = new AMap.Polyline({
+                                    path: path,
+                                    isOutline: true,
+                                    outlineColor: '#ffeeee',
+                                    borderWeight: 2,
+                                    strokeWeight: 5,
+                                    strokeColor: '#0091ff',
+                                    lineJoin: 'round'
+                                })
+
+                                routeLine.setMap(map)
+
+                                // 调整视野达到最佳显示区域
+                                map.setFitView([ startMarker,endMarker, routeLine])
+                            }
+                            function parseRouteToPath(route) {
+                                var path = []
+                                for (var i = 0, l = route.steps.length; i < l; i++) {
+                                    var step = route.steps[i]
+                                    for (var j = 0, n = step.path.length; j < n; j++) {
+                                        path.push(step.path[j])
+                                    }
+                                }
+                                return path
+                            }
+                        } else {
+                            console.log('定位失败！');
+                        }
+                    });
+                });
+            }
+           
+            function getQueryVariable(variable)
+                    {
+                        var query = window.location.search.substring(1);
+                        var vars = query.split("&");
+                        for (var i=0;i<vars.length;i++) {
+                                var pair = vars[i].split("=");
+                                if(pair[0] == variable){return pair[1];}
+                        }
+                        return(false);
+                    }
+            window.onload = function(){
+                pointList = JSON.parse(decodeURIComponent(getQueryVariable('data')))
+                // alert(JSON.stringify(pointList))
+                // startRun()     
+                // completeEventHandler(pointList)
+                // markLocation('container', pointList);
+                // markLocation('container', pointList);
+                markLocation('container', '广东省汕头市月浦');
+            }  
+            
+        // })
+    </script>
+</body>
+</html> -->
+
+<!-- 测试1    -->
+ <!-- <!DOCTYPE HTML>
+<html >
+<head>
+<style type="text/css">  
+body,html,#iCenter{
+           width:100%;
+           height:100%;
+           overflow: hidden;
+           margin:0;
+       }
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>轨迹回放</title>
+<link rel="stylesheet" type="text/css" src="./map.css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.3&key=ad26780bfaabf0ca27ae6078e2e81682&plugin=AMap.Driving,AMap.Geocoder,AMap.TruckDriving"></script>
+<script language="javascript">
+var mapObj;
+//初始化地图对象，加载地图
+function mapInit(){
+    mapObj = new AMap.Map("iCenter",{
+		// zooms:[7,17],
+        //二维地图显示视口
+        view: new AMap.View2D({
+            center:new AMap.LngLat(116.397428,39.90923),//地图中心点
+            zoom:13 //地图显示的缩放级别
+        }),
+        continuousZoomEnable:true,
+        // dragEnable: false
+    });
+    AMap.event.addListener(mapObj,"complete",completeEventHandler);    
+}
+
+//地图图块加载完毕后执行函数
+function completeEventHandler(){ 
+    marker = new AMap.Marker({
+        map:mapObj,
+        //draggable:true, //是否可拖动
+        position:new AMap.LngLat(116.397428,39.90923),//基点位置
+        icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+        offset:new AMap.Pixel(-8, -10), //相对于基点的位置
+        autoRotation:true
+    });
+
+
+	     marker = new AMap.Marker({
+            map:mapObj,
+            //draggable:true, //是否可拖动
+            position:new AMap.LngLat(116.427907,39.909270),//基点位置
+            icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+            offset:new AMap.Pixel(-8, -10), //相对于基点的位置
+            autoRotation:true
+        });
+
+	    marker = new AMap.Marker({
+        map:mapObj,
+        //draggable:true, //是否可拖动
+        position:new AMap.LngLat(116.432303,39.909320),//基点位置
+        icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+        offset:new AMap.Pixel(-8, -10), //相对于基点的位置
+        autoRotation:true
+    });
+
+
+	    marker = new AMap.Marker({
+        map:mapObj,
+        //draggable:true, //是否可拖动
+        position:new AMap.LngLat(116.424767,39.961329),//基点位置
+        icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+        offset:new AMap.Pixel(-8, -10), //相对于基点的位置
+        autoRotation:true
+    });
+
+		    marker = new AMap.Marker({
+        map:mapObj,
+        //draggable:true, //是否可拖动
+        position:new AMap.LngLat(116.444317,39.960287),//基点位置
+        icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+        // offset:new AMap.Pixel(-26,-13), //相对于基点的位置
+        autoRotation:true,
+         offset: new AMap.Pixel(-8, -10) // 相对于基点的偏移位置
+    });
+
+
+    var lngX = 116.397428;
+    var latY = 39.90923;       
+    lineArr = new Array();
+    lineArr.push(new AMap.LngLat(lngX,latY));
+
+        lineArr.push(new AMap.LngLat(116.427907,39.909270));
+		lineArr.push(new AMap.LngLat(116.432303,39.909320));
+		lineArr.push(new AMap.LngLat(116.424767,39.961329));
+		lineArr.push(new AMap.LngLat(116.444317,39.960287));
+
+      //绘制轨迹
+    var polyline = new AMap.Polyline({
+        map:mapObj,
+        path:lineArr,
+  strokeColor:"#3366FF",//线颜色
+        strokeOpacity:1,//线透明度
+        strokeWeight:7,//线宽
+        strokeStyle:"solid"//线样式
+    });
+    mapObj.setFitView();
+  }
+
+</script>
+<style>
+
+</style>
+</head>
+<body onLoad="mapInit()" width:100%;height:100%;overflow: hidden;>
+    <div class="iCenter" id="iCenter" ></div>
+
+</body>
+</html>    -->
+
+
+
+<!-- 测试2    -->
+<!DOCTYPE HTML>
+<html >
+<head>
+<style type="text/css">  
+body,html,#iCenter{
+           width:100%;
+           height:100%;
+           overflow: hidden;
+           margin:0;
+       }
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>轨迹</title>
+<link rel="stylesheet" type="text/css" src="./map.css" />
+<script language="javascript" src="http://webapi.amap.com/maps?v=1.3&key=ad26780bfaabf0ca27ae6078e2e81682&plugin=AMap.Driving,AMap.Geocoder,AMap.TruckDriving"></script>
+<script language="javascript">
+    var mapObj;
+    //坐标所有集合
+    var pointList=[
+        // {longitude:116.397428,latitude:39.90923},
+        // {longitude:116.427907,latitude:39.909270},
+        // {longitude:116.432303,latitude:39.909320},
+        // {longitude:116.424767,latitude:39.961329},
+        // {longitude:116.444317,latitude:39.960287},
+    ]
+    //初始化地图对象，加载地图
+    function mapInit(){
+        mapObj = new AMap.Map("iCenter",{
+            // zooms:[7,17],
+            //二维地图显示视口
+            view: new AMap.View2D({
+                center:new AMap.LngLat(116.397428,39.90923),//地图中心点
+                zoom:13 //地图显示的缩放级别
+            }),
+            continuousZoomEnable:true,
+            // dragEnable: false
+        });
+        AMap.event.addListener(mapObj,"complete",completeEventHandler);    
+    }
+
+    //地图图块加载完毕后执行函数
+    function completeEventHandler(){ 
+        for(var i = 0;i<pointList.length;i++){
+            //     lngX = pointList[i].longitude; //纬度
+            //     latY = pointList[i].latitude; //经度
+            //     lineArr.push(new AMap.LngLat(lngX,latY));
+            // }
+        marker = new AMap.Marker({
+            map:mapObj,
+            //draggable:true, //是否可拖动
+            position:new AMap.LngLat(pointList[i].longitude,pointList[i].latitude),//基点位置
+            icon:'http://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
+            offset:new AMap.Pixel(-8, -10), //相对于基点的位置
+            autoRotation:true
+        });
+
+    }
+        lineArr = new Array();
+        for(var i = 0;i<pointList.length;i++){
+            lngX = pointList[i].longitude; //纬度
+            latY = pointList[i].latitude; //经度
+            lineArr.push(new AMap.LngLat(lngX,latY));
+        }
+      //绘制轨迹
+    var polyline = new AMap.Polyline({
+        map:mapObj,
+        path:lineArr,
+        strokeColor:"#3366FF",//线颜色
+        strokeOpacity:1,//线透明度
+        strokeWeight:7,//线宽
+        strokeStyle:"solid"//线样式
+    });
+    mapObj.setFitView();
+  }
+   // 解析url参数
+   function getQueryVariable(variable){
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+                var pair = vars[i].split("=");
+                if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+    /**
+     * 监听RN webview 发送到 html5 的消息   
+     */
+    window.onload = function(){
+        pointList = JSON.parse(decodeURIComponent(getQueryVariable('data')))
+        alert(JSON.stringify(pointList))  
+        mapInit()
+          
+        // completeEventHandler(pointList)
+    }    
+</script>
+</head>
+<body  width:100%;height:100%;overflow: hidden;>
+    <div class="iCenter" id="iCenter" ></div>
+</body>
+</html>   
