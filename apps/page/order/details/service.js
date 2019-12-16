@@ -1,6 +1,5 @@
 import React,{Component} from 'react'
 import {View,Text,StyleSheet,Dimensions,TextInput,Alert} from 'react-native'
-import DatePicker from 'react-native-datepicker'
 const {width} =Dimensions.get('window')
 import {requests} from '../../../http'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -49,30 +48,7 @@ export default class ComponentInfo extends Component{
                     <Text style={{fontSize:15,marginTop:13}}>
                         服务时间：
                     </Text>
-                    <DatePicker
-                        style={{width: 200}}
-                        date={this.state.date}
-                        mode="date"
-                        format="YYYY-MM-DD"
-                        minDate="2016-05-01"
-                        maxDate="2016-06-01"
-                        confirmBtnText="Confirm"
-                        cancelBtnText="Cancel"
-                        customStyles={{
-                        // dateIcon: {
-                        //     position: 'absolute',
-                        //     left: 0,
-                        //     top: 4,
-                        //     marginLeft: 0
-                        // },
-                        dateInput: {
-                            marginLeft: 36,
-                            borderWidth:0
-                        }
-                        // ... You can check the source to find the other keys.
-                        }}
-                        onDateChange={(date) => {this.setState({date: date})}}
-                    />
+                    
                 </View>
                 <View style={styles.remark}>
                     <Text style={{fontSize:15,marginTop:10}}>
