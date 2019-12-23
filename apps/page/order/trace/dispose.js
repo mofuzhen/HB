@@ -4,8 +4,9 @@ import {requests} from '../../../http'
 import ModalDropdown from 'react-native-modal-dropdown';
 import CheckBox from 'react-native-checkbox';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button'
-import ImagePicker from 'react-native-image-crop-picker';
-import Spinner from 'react-native-loading-spinner-overlay';
+import ImagePicker from 'react-native-image-picker';
+// import ImagePicker from 'react-native-image-crop-picker';
+// import Spinner from 'react-native-loading-spinner-overlay';
 const {width,height}=Dimensions.get('window')
 
 
@@ -32,7 +33,7 @@ export default class Dispose extends Component{
             initialPosition: 'unknown', //定位初始值
             latitude:1, //纬度
             longitude:1, //经度
-            Spinner:false,
+            // Spinner:false,
             // images:[
             //     // {url:'https://img01.sogoucdn.com/app/a/100520115/8e9410faedeefdf258b9acc6140fed0f'},
             //     // {url:'https://img01.sogoucdn.com/app/a/100520115/8e9410faedeefdf258b9acc6140fed0f'}
@@ -41,7 +42,7 @@ export default class Dispose extends Component{
         }
         this.onSelect = this.onSelect.bind(this)
     }
-    //添加视频
+    //上传视频
     _renderAddVideoView(){
          //判断state中是否存在图片路径信息，如果没有，就显示添加图片的按钮。
          console.info(this.state.data_1.length==0)  //true
@@ -106,25 +107,53 @@ export default class Dispose extends Component{
          }
     }
     //添加视频
+    
     addOnClickedVideo(){
-        //这里对应，react-native-image-crop-picker组件
-        ImagePicker.openPicker({
-            // multiple: true,
-            minFiles:3,
-            maxFiles:5,
-            cropperChooseText:"确定",
-            cropperCancelText:"取消",
-        }).then(image => {
-            let data_1=this.state.data_1
-            data_1.push({url:image.path,mine:image.mine})
-            this.setState({
-            //   images: images.map(i => {
-            //     console.log('received image', i);
-            //     return {url: i.path, width: i.wi dth, height: i.height, mime: i.mime};
-            //   })
-            data_1:data_1
-            });
-          }).catch(e => alert(e));
+        const options = {
+            title: 'Video Picker',
+            takePhotoButtonTitle: 'Take Video...',
+            mediaType: 'video',
+            videoQuality: 'medium',
+          };
+        ImagePicker.showImagePicker(options, response => {
+            console.log('Response = ', response);
+      
+            if (response.didCancel) {
+              console.log('User cancelled video picker');
+            } else if (response.error) {
+              console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+              console.log('User tapped custom button: ', response.customButton);
+            } else {
+            //   let source = {uri: response.uri};
+              let data_1=this.state.data_1;
+              data_1.push({url: response.uri})
+              // You can also display the image using data:
+              // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+              
+              this.setState({
+                data_1: data_1,
+              });
+            }
+          });
+    //     //这里对应，react-native-image-crop-picker组件
+    //     ImagePicker.openPicker({
+    //         // multiple: true,
+    //         minFiles:3,
+    //         maxFiles:5,
+    //         cropperChooseText:"确定",
+    //         cropperCancelText:"取消",
+    //     }).then(image => {
+    //         let data_1=this.state.data_1
+    //         data_1.push({url:image.path,mine:image.mine})
+    //         this.setState({
+    //         //   images: images.map(i => {
+    //         //     console.log('received image', i);
+    //         //     return {url: i.path, width: i.wi dth, height: i.height, mime: i.mime};
+    //         //   })
+    //         data_1:data_1
+    //         });
+    //       }).catch(e => alert(e));
     }
     //删除视频
     deleteLoadedVideo(url){
@@ -139,7 +168,7 @@ export default class Dispose extends Component{
         //重新刷新视图
         this.setState({data_1:imageUrls})
     }
-    //添加图片
+    //上传图片
     _renderAddImageView(){
         //判断state中是否存在图片路径信息，如果没有，就显示添加图片的按钮。
         console.info(this.state.data_0.length==0)  //true
@@ -203,25 +232,55 @@ export default class Dispose extends Component{
             return (pages)
         }
     }
+    //添加图片
     addOnClickedImage(){
-        //这里对应，react-native-image-crop-picker组件
-        ImagePicker.openPicker({
-            // multiple: true,
-            minFiles:3,
-            maxFiles:5,
-            cropperChooseText:"确定",
-            cropperCancelText:"取消",
-        }).then(image => {
-            let data_0=this.state.data_0
-            data_0.push({url:image.path,mine:image.mine})
-            this.setState({
-            //   images: images.map(i => {
-            //     console.log('received image', i);
-            //     return {url: i.path, width: i.wi dth, height: i.height, mime: i.mime};
-            //   })
-            data_0:data_0
-            });
-          }).catch(e => alert(e));
+        const options = {
+            quality: 1.0,
+            maxWidth: 500,
+            maxHeight: 500,
+            storageOptions: {
+                skipBackup: true,
+            },
+            };
+        ImagePicker.showImagePicker(options, response => {
+            console.log('Response = ', response);
+      
+            if (response.didCancel) {
+              console.log('User cancelled photo picker');
+            } else if (response.error) {
+              console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+              console.log('User tapped custom button: ', response.customButton);
+            } else {
+            //   let source = {uri: response.uri};
+              let data_0=this.state.data_0;
+              data_0.push({url: response.uri})
+              // You can also display the image using data:
+              // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+              
+              this.setState({
+                data_0: data_0,
+              });
+            }
+          });
+        // //这里对应，react-native-image-crop-picker组件
+        // ImagePicker.openPicker({
+        //     // multiple: true,
+        //     minFiles:3,
+        //     maxFiles:5,
+        //     cropperChooseText:"确定",
+        //     cropperCancelText:"取消",
+        // }).then(image => {
+        //     let data_0=this.state.data_0
+        //     data_0.push({url:image.path,mine:image.mine})
+        //     this.setState({
+        //     //   images: images.map(i => {
+        //     //     console.log('received image', i);
+        //     //     return {url: i.path, width: i.wi dth, height: i.height, mime: i.mime};
+        //     //   })
+        //     data_0:data_0
+        //     });
+        //   }).catch(e => alert(e));
     }
     //删除加载的图片
     deleteLoadedImage(url){

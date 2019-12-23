@@ -5448,15 +5448,15 @@ react-native-gesture-handler@^1.5.0:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-image-crop-picker@^0.25.3:
-  version "0.25.3"
-  resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.25.3.tgz#46ee28b4a0a187240e388bd28a44cf8c274caec6"
-  integrity sha512-jQ416WXEiEQ3w057QOYU++8/mDqYb2A/AGZY/NwR5eKda/z8a4wncWKj7oF9KBAHNKE1TmPrl9Rm0GZ0Jrzp6A==
-
 react-native-image-pan-zoom@^2.1.9:
   version "2.1.11"
   resolved "http://r.cnpmjs.org/react-native-image-pan-zoom/download/react-native-image-pan-zoom-2.1.11.tgz#61bcb69219d95e76a9797d23e4a2e8e0bd654ae9"
   integrity sha1-Yby2khnZXnapeX0j5KLo4L1lSuk=
+
+react-native-image-picker@^1.1.0:
+  version "1.1.0"
+  resolved "http://r.cnpmjs.org/react-native-image-picker/download/react-native-image-picker-1.1.0.tgz#c2a0523886edb4cf2cdc008ad0a71433142a4d53"
+  integrity sha1-wqBSOIbttM8s3ACK0KcUMxQqTVM=
 
 react-native-image-zoom-viewer@^2.2.26:
   version "2.2.26"
@@ -5464,13 +5464,6 @@ react-native-image-zoom-viewer@^2.2.26:
   integrity sha1-xvBwq7CUz74bO32KOK2Xml+svcU=
   dependencies:
     react-native-image-pan-zoom "^2.1.9"
-
-react-native-loading-spinner-overlay@^1.0.1:
-  version "1.0.1"
-  resolved "http://r.cnpmjs.org/react-native-loading-spinner-overlay/download/react-native-loading-spinner-overlay-1.0.1.tgz#07f85a072b6f7d05b8749668cd626df4cc330347"
-  integrity sha1-B/haBytvfQW4dJZozWJt9MwzA0c=
-  dependencies:
-    prop-types "^15.6.2"
 
 react-native-modal-dropdown@^0.7.0:
   version "0.7.0"
