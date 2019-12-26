@@ -5,6 +5,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import CheckBox from 'react-native-checkbox';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button'
 import ImagePicker from 'react-native-image-picker';
+import Video from 'react-native-video'
 // import ImagePicker from 'react-native-image-crop-picker';
 // import Spinner from 'react-native-loading-spinner-overlay';
 const {width,height}=Dimensions.get('window')
@@ -53,7 +54,7 @@ export default class Dispose extends Component{
                      source={require('../../../common/image/xuxian.webp')}
                      style ={styles.image}>
                      <TouchableOpacity onPress = {this.addOnClickedVideo.bind(this)}>
-                         <Image style={{width:30, height:30}} source={require('../../../common/image/tianjia.webp')}></Image>
+                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
                      </TouchableOpacity>
                      <Text style ={styles.normalTitle}>上传视频</Text>
                      {/* 这里显示最多可以上传多少张 */}
@@ -67,24 +68,35 @@ export default class Dispose extends Component{
          if (this.state.data_1.length>0) {
              this.state.data_1.map(item => {
                  let url=item.url
-                 // var imgType=["gif", "jpeg", "jpg", "bmp", "png","webp"];
-                 var videoType=["avi","wmv","mkv","mp4","mov","rm","3gp","flv","mpg","rmvb"];
-                 // if(RegExp("\.(" + imgType.join("|") + ")$", "i").test(url.toLowerCase())) {
-                 if(RegExp("\.(" + videoType.join("|") + ")$", "i").test(url.toLowerCase())) {
+                 console.log(url)
+                //  var videoType=["avi","wmv","mkv","mp4","mov","rm","3gp","flv","mpg","rmvb"];
+                //  if(RegExp("\.(" + videoType.join("|") + ")$", "i").test(url.toLowerCase())) {
                      pages.push(
                          <ImageBackground
                              index = {1}
                              source={require('../../../common/image/xuxian.webp')}
                              style ={styles.image}>
-                             <ImageBackground source={{uri:url}} style={styles.uploadImage} />
+                             <Video source={{uri:url}} 
+                                style={{width: width/3-width*0.07, height: width/3-width*0.07}} 
+                                ref={(ref) => {
+                                this.player = ref
+                                }}                                      
+                                onBuffer={this.onBuffer}                
+                                onError={this.videoError}  
+                                resizeMode  ={'cover'}
+                                paused={this.state.paused}//暂停
+                                // rate={1.0}
+                                // volume={1.0}
+                                // paused={!this.state.isPlaying}
+                            />
                              <TouchableOpacity style={styles.rightDelButton} onPress = {()=>this.deleteLoadedVideo(url)}>
                                  <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.webp')}></Image>
                              </TouchableOpacity>
                          </ImageBackground>
                     )
-                 }else{
-                     return false;
-                 }
+                //  }else{
+                //      return false;
+                //  }
              })
             
              //注意这里，如果图片数量小于5，那么我们需要显示可以继续添加。
@@ -95,7 +107,7 @@ export default class Dispose extends Component{
                      source={require('../../../common/image/xuxian.webp')}
                      style ={styles.image}>
                      <TouchableOpacity onPress = {this.addOnClickedVideo.bind(this)}>
-                         <Image style={{width:60, height:60}} source={require('../../../common/image/tianjia.webp')}></Image>
+                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
                      </TouchableOpacity>
                      <Text style ={styles.normalTitle}>上传视频</Text>
                      {/* 这里显示最多可以上传多少张 */}
@@ -133,7 +145,7 @@ export default class Dispose extends Component{
               
               this.setState({
                 data_1: data_1,
-              });
+              },()=>console.log(this.state.data_1));
             }
           });
     //     //这里对应，react-native-image-crop-picker组件
@@ -156,7 +168,7 @@ export default class Dispose extends Component{
     //       }).catch(e => alert(e));
     }
     //删除视频
-    deleteLoadedVideo(url){
+    deleteLoadedVideo(url){ 
         // console.log(url)
         let imageUrls= new Set();
         imageUrls=this.state.data_1;
@@ -179,7 +191,7 @@ export default class Dispose extends Component{
                     source={require('../../../common/image/xuxian.webp')}
                     style ={styles.image}>
                     <TouchableOpacity onPress = {this.addOnClickedImage.bind(this)}>
-                        <Image style={{width:30, height:30}} source={require('../../../common/image/tianjia.webp')}></Image>
+                        <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
                     </TouchableOpacity>
                     <Text style ={styles.normalTitle}>上传图片</Text>
                     {/* 这里显示最多可以上传多少张 */}
@@ -196,12 +208,12 @@ export default class Dispose extends Component{
                 let url=item.url
                 var imgType=["gif", "jpeg", "jpg", "bmp", "png","webp"];
                 if(RegExp("\.(" + imgType.join("|") + ")$", "i").test(url.toLowerCase())) {
-                // if(RegExp("\.(" + videoType.join("|") + ")$", "i").test(url.toLowerCase())) {
                     pages.push(
                         <ImageBackground
-                            index = {1}
+                            // index = {1}
                             source={require('../../../common/image/xuxian.webp')}
-                            style ={styles.image}>
+                            style ={styles.image}
+                            >
                             <ImageBackground source={{uri:url}} style={styles.uploadImage} />
                             <TouchableOpacity style={styles.rightDelButton} onPress = {()=>this.deleteLoadedImage(url)}>
                                 <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.webp')}></Image>
@@ -214,14 +226,16 @@ export default class Dispose extends Component{
             })
            
             //注意这里，如果图片数量小于5，那么我们需要显示可以继续添加。
-            if(this.state.data_0.length<5){
+            if(this.state.data_0.length<7){
                 // alert(1)
                 pages.push(
                 <ImageBackground
                     source={require('../../../common/image/xuxian.webp')}
                     style ={styles.image}>
                     <TouchableOpacity onPress = {this.addOnClickedImage.bind(this)}>
-                        <Image style={{width:60, height:60}} source={require('../../../common/image/tianjia.webp')}></Image>
+                        <Image style={{width:width*0.15, height:width*0.15}}
+                            source={require('../../../common/image/tianjia.webp')} 
+                            />
                     </TouchableOpacity>
                     <Text style ={styles.normalTitle}>上传图片</Text>
                     {/* 这里显示最多可以上传多少张 */}
@@ -263,24 +277,6 @@ export default class Dispose extends Component{
               });
             }
           });
-        // //这里对应，react-native-image-crop-picker组件
-        // ImagePicker.openPicker({
-        //     // multiple: true,
-        //     minFiles:3,
-        //     maxFiles:5,
-        //     cropperChooseText:"确定",
-        //     cropperCancelText:"取消",
-        // }).then(image => {
-        //     let data_0=this.state.data_0
-        //     data_0.push({url:image.path,mine:image.mine})
-        //     this.setState({
-        //     //   images: images.map(i => {
-        //     //     console.log('received image', i);
-        //     //     return {url: i.path, width: i.wi dth, height: i.height, mime: i.mime};
-        //     //   })
-        //     data_0:data_0
-        //     });
-        //   }).catch(e => alert(e));
     }
     //删除加载的图片
     deleteLoadedImage(url){
@@ -419,7 +415,7 @@ export default class Dispose extends Component{
                             <Text 
                                 style={{width:width*0.2,height:height*0.1,borderColor:'#333333',
                                 borderWidth:1,marginLeft:width*0.05
-                            }}> 
+                            }}>
                             </Text>
                         </TouchableOpacity>   
                     </View>
@@ -533,7 +529,7 @@ export default class Dispose extends Component{
             return(
                 <View>
                     <View style={styles.info}>
-                        <Text style={{fontSize:17,width:width*0.2}}>
+                        <Text style={{fontSize:17,width:width*0.2}}>    
                             {form_3.filed}：
                         </Text>
                         <TextInput  
@@ -716,7 +712,6 @@ export default class Dispose extends Component{
                     >
                         提交
                     </Text>
-                    
                 </View>
             </ScrollView>
         )
@@ -764,30 +759,36 @@ const styles=StyleSheet.create({
         width:width*0.25,
     },
     normalTitle:{
-        textAlign:"center"
+        textAlign:"center",
+        fontSize:(width/3-width*0.056)/8
     },
     normalText:{
-        textAlign:"center"
+        textAlign:"center",
+        fontSize:(width/3-width*0.056)/8
     },
     image:{
         alignItems:"center",
         justifyContent:"center",
-        width:width/3-20,
-        height:width/3-20,
+        width:width/3-width*0.056,
+        height:width/3-width*0.056,
         marginTop:10,
+        marginLeft:width*0.02
     },
     uploadImage:{
-        borderBottomColor:'red',
+        // borderBottomColor:'red',
         alignItems:"center",
         justifyContent:"center",
-        width:width/2-30,
-        height:width/2-30,
+        width: width/3-width*0.08,
+        height: width/3-width*0.08,
+        resizeMode:'cover'
     },
     rightDelButton:{
         position: 'absolute',
-        top: -5,
-        left:Platform.OS==="ios"?18:width/2-30,
+        top: 1,
+        // left:Platform.OS==="ios"?18:width/4+15,
+        right:1,
         margin: -1,
         flexDirection:"row-reverse",
+        zIndex:9999
     }
 })  
