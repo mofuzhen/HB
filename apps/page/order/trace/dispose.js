@@ -3,7 +3,7 @@ import {ScrollView,View,Text,Dimensions,TextInput,StyleSheet,Image,TouchableOpac
 import {requests} from '../../../http'
 import ModalDropdown from 'react-native-modal-dropdown';
 import CheckBox from 'react-native-checkbox';
-import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button'
+import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
 import ImagePicker from 'react-native-image-picker';
 import Video from 'react-native-video'
 // import ImagePicker from 'react-native-image-crop-picker';
@@ -51,10 +51,10 @@ export default class Dispose extends Component{
              // alert(0)
              return (
                  <ImageBackground
-                     source={require('../../../common/image/xuxian.webp')}
+                     source={require('../../../common/image/xuxian.png')}
                      style ={styles.image}>
                      <TouchableOpacity onPress = {this.addOnClickedVideo.bind(this)}>
-                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
+                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.png')}></Image>
                      </TouchableOpacity>
                      <Text style ={styles.normalTitle}>上传视频</Text>
                      {/* 这里显示最多可以上传多少张 */}
@@ -74,7 +74,7 @@ export default class Dispose extends Component{
                      pages.push(
                          <ImageBackground
                              index = {1}
-                             source={require('../../../common/image/xuxian.webp')}
+                             source={require('../../../common/image/xuxian.png')}
                              style ={styles.image}>
                              <Video source={{uri:url}} 
                                 style={{width: width/3-width*0.07, height: width/3-width*0.07}} 
@@ -90,7 +90,7 @@ export default class Dispose extends Component{
                                 // paused={!this.state.isPlaying}
                             />
                              <TouchableOpacity style={styles.rightDelButton} onPress = {()=>this.deleteLoadedVideo(url)}>
-                                 <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.webp')}></Image>
+                                 <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.png')}></Image>
                              </TouchableOpacity>
                          </ImageBackground>
                     )
@@ -104,10 +104,10 @@ export default class Dispose extends Component{
                  // alert(1)
                  pages.push(
                  <ImageBackground
-                     source={require('../../../common/image/xuxian.webp')}
+                     source={require('../../../common/image/xuxian.png')}
                      style ={styles.image}>
                      <TouchableOpacity onPress = {this.addOnClickedVideo.bind(this)}>
-                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
+                         <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.png')}></Image>
                      </TouchableOpacity>
                      <Text style ={styles.normalTitle}>上传视频</Text>
                      {/* 这里显示最多可以上传多少张 */}
@@ -188,10 +188,10 @@ export default class Dispose extends Component{
             // alert(0)
             return (
                 <ImageBackground
-                    source={require('../../../common/image/xuxian.webp')}
+                    source={require('../../../common/image/xuxian.png')}
                     style ={styles.image}>
                     <TouchableOpacity onPress = {this.addOnClickedImage.bind(this)}>
-                        <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.webp')}></Image>
+                        <Image style={{width:width*0.15, height:width*0.15}} source={require('../../../common/image/tianjia.png')}></Image>
                     </TouchableOpacity>
                     <Text style ={styles.normalTitle}>上传图片</Text>
                     {/* 这里显示最多可以上传多少张 */}
@@ -211,12 +211,12 @@ export default class Dispose extends Component{
                     pages.push(
                         <ImageBackground
                             // index = {1}
-                            source={require('../../../common/image/xuxian.webp')}
+                            source={require('../../../common/image/xuxian.png')}
                             style ={styles.image}
                             >
                             <ImageBackground source={{uri:url}} style={styles.uploadImage} />
                             <TouchableOpacity style={styles.rightDelButton} onPress = {()=>this.deleteLoadedImage(url)}>
-                                <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.webp')}></Image>
+                                <Image style={{width:20, height:20}} onPress = {()=>alert(23)} source={require('../../../common/image/shanchu.png')}></Image>
                             </TouchableOpacity>
                         </ImageBackground>
                    )
@@ -230,11 +230,11 @@ export default class Dispose extends Component{
                 // alert(1)
                 pages.push(
                 <ImageBackground
-                    source={require('../../../common/image/xuxian.webp')}
+                    source={require('../../../common/image/xuxian.png')}
                     style ={styles.image}>
                     <TouchableOpacity onPress = {this.addOnClickedImage.bind(this)}>
                         <Image style={{width:width*0.15, height:width*0.15}}
-                            source={require('../../../common/image/tianjia.webp')} 
+                            source={require('../../../common/image/tianjia.png')} 
                             />
                     </TouchableOpacity>
                     <Text style ={styles.normalTitle}>上传图片</Text>
@@ -505,7 +505,7 @@ export default class Dispose extends Component{
                                 height:150,borderRadius:5,textAlignVertical:'top'}} 
                                 placeholder="请输备注"  
                                 // autoFocus={true}
-                                maxLength={200}
+                                maxLength={100}
                                 multiline={true}
                                 onChangeText={
                                 (text) => { 
