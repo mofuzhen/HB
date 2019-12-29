@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {Text,View,StyleSheet,Image,Dimensions,TouchableOpacity} from 'react-native'
+import {Text,View,StyleSheet,Image,Dimensions,ScrollView} from 'react-native'
 import OrderList from "../../../component/orderList"
 import {requests} from '../../../http'
 
@@ -165,7 +165,7 @@ export default class Order extends Component{
                     >
                     &lt;
                 </Text>
-                <View>  
+                <View style={{flex:1}}>  
                     <View style={styles.header}>
                         <Image 
                             style={styles.logo_img} 
@@ -206,17 +206,14 @@ export default class Order extends Component{
                             })
                         }
                     </View>
-                    {/* <TouchableOpacity onPress={()=>this.handleChangeInfo(category)}> */}
+                    <ScrollView style={{flex:1}}>
                         <OrderList 
                             detailsData={this.state.detailsData}
                             style={{flex:1}}
                             navigate={this.props.navigation.navigate}
                             category={category}
-                            // status_fixed={status_fixed}
-                            // signId={signId}
-                            // status_sign={this.state.status_sign}
-                        />
-                    {/* </TouchableOpacity> */}
+                            />
+                    </ScrollView>
                 </View>
             </View>
         )
@@ -225,7 +222,7 @@ export default class Order extends Component{
     
 const styles = StyleSheet.create({
     container: {
-        // flex:1
+        flex:1
     },
     header: {
         flexDirection:'row',

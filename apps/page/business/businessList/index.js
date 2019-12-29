@@ -103,7 +103,7 @@ export default class BusinessList extends Component{
         return  (
             <View style={styles.component}>
                 <View style={styles.component_item}>
-                    <Image style={{width: width*0.15, height: height*0.065,backgroundColor:'red',resizeMode:'contain'}} 
+                    <Image style={{width: width*0.15, height: height*0.065,resizeMode:'contain'}} 
                     source={{uri:logos}}
                     />
                     <Text 
@@ -153,7 +153,7 @@ export default class BusinessList extends Component{
                             source={require('../../../common/image/logo.png')}
                         />
                     </View>  
-                    {this.state.listData.length>0?
+                    {this.state.listData?
                         <View style={styles.mybusiness}>
                             <Text style={styles.mybusiness_Item}>
                                 我的企业    
@@ -179,17 +179,20 @@ export default class BusinessList extends Component{
                             </View>
                             :
                             null
-                        }    
+                        }  
+                        
                     </View>
-                    :
+                   
+                     :
                     <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingTop:height*0.3}}>
                         <Text style={{fontSize:30}}>No data</Text>
                     </View>
                     }  
+                        
                 </View>
                 {
                     this.loadingData()
-                }   
+                }
             </View>                
         )
     }

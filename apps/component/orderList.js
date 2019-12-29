@@ -1,5 +1,6 @@
 import React,{Component} from 'react'
-import {Text,View,StyleSheet,Dimensions,Image,FlatList,TouchableOpacity} from 'react-native'
+import {Text,View,StyleSheet,Dimensions,Image,FlatList,TouchableOpacity,ScrollView} from 'react-native'
+// import { ScrollView } from 'react-native-gesture-handler';
 
 var {width,height}=Dimensions.get('window');
 var marginL=width*0.05;
@@ -104,11 +105,11 @@ export default class OrderList extends Component{
     }
     render(){
         return(
-            <FlatList
-                data={this.props.detailsData}
-                renderItem={(data)=>this.renderItem(data)}
-                keyExtractor={(item,index)=>index.toString()}
-                />    
+                <FlatList
+                    data={this.props.detailsData}
+                    renderItem={(data)=>this.renderItem(data)}
+                    keyExtractor={(item,index)=>index.toString()}
+                    />        
         )
     }
     // componentDidMount(){
