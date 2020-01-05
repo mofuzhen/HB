@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {Text,View,StyleSheet,Image,Dimensions,ScrollView} from 'react-native'
+import {Text,View,StyleSheet,Image,Dimensions,ScrollView,TouchableOpacity} from 'react-native'
 import OrderList from "../../../component/orderList"
 import {requests} from '../../../http'
 
@@ -106,7 +106,7 @@ export default class Order extends Component{
             page:1
         })
     }   
-    //返回上一页
+    返回上一页
     goHome(){   
         this.props.navigation.navigate('businessList')
     }
@@ -159,12 +159,7 @@ export default class Order extends Component{
         const {category,name,logos} =this.state
         return(
             <View style={styles.container}>
-                <Text  
-                    onPress={this.goHome.bind(this)}
-                    style={styles.goBack} 
-                    >
-                    &lt;
-                </Text>
+                                         
                 <View style={{flex:1}}>  
                     <View style={styles.header}>
                         <Image 
@@ -184,9 +179,14 @@ export default class Order extends Component{
                             />
                             <View style={{marginBottom:5}}>
                                 <Text style={styles.text}>Nick</Text>
-                            </View>
-                            
+                            </View> 
                         </View>
+                        <Text onPress={this.goHome.bind(this)} style={{height:50,position:'absolute',top:height*0.02,left:5}}>
+                            <Image 
+                                source={require('../../../common/image/leftarrow.png')}
+                                style={{width:25,height:25,resizeMode:'cover'}}
+                            /> 
+                        </Text>  
                     </View>
                     <View style={styles.orderList}>
                         <Text style={styles.orderListName}>
@@ -206,14 +206,14 @@ export default class Order extends Component{
                             })
                         }
                     </View>
-                    <ScrollView style={{flex:1}}>
-                        <OrderList 
-                            detailsData={this.state.detailsData}
-                            style={{flex:1}}
-                            navigate={this.props.navigation.navigate}
-                            category={category}
-                            />
-                    </ScrollView>
+                        <ScrollView style={{flex:1}}>
+                            <OrderList 
+                                detailsData={this.state.detailsData}
+                                style={{flex:1}}
+                                navigate={this.props.navigation.navigate}
+                                category={category}
+                                />
+                        </ScrollView>   
                 </View>
             </View>
         )
@@ -222,7 +222,7 @@ export default class Order extends Component{
     
 const styles = StyleSheet.create({
     container: {
-        flex:1
+        flex:1,
     },
     header: {
         flexDirection:'row',
@@ -230,32 +230,38 @@ const styles = StyleSheet.create({
         position:'relative',
         borderBottomColor:'#D7D7D7',
         borderBottomWidth:1,
+        paddingLeft:width*0.05,
+        paddingRight:width*0.05,
+        paddingTop:height*0.06,
+        textAlign:'center',
+        justifyContent:'space-between'
     },
-    goBack: {
-        paddingLeft:10,
-        fontSize:30,
-        color:'#333333',
-    },
+    // goBack: {
+    //     paddingLeft:10,
+    //     fontSize:30,
+    //     color:'#333333',
+    // },
     logo_img: {
         width:width*0.18,
         height:height*0.08,
-        marginLeft:width*0.05,
+        // marginLeft:width*0.05,
         resizeMode:'contain',
     },
     name: {
         fontSize:19,
         color:'#333333',
-        marginLeft:width*0.05,
+        // marginLeft:width*0.05,
         marginTop:height*0.02,
-        width:width*0.47,
-        fontWeight:'bold'
+        width:width*0.45,
+        fontWeight:'bold',
+        textAlign:'center'
     },
     texts: {
         flexDirection:'column',
         alignItems:'center',
-        position:'absolute',
-        right:0,
-        marginRight:width*0.05,
+        // position:'absolute',
+        // right:0,
+        // marginRight:width*0.05,
     },
     username: {
         width:width*0.2,

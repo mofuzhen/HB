@@ -36,14 +36,14 @@ export default class ComponentInfo extends Component{
                         (已派单)
                     </Text> 
         }
-        if(category==1&&status_fixed==1){
-            return  <Text 
-                        onPress={()=>this.changeEvent(signId)}
-                        style={styles.first_button}
-                    >
-                        请求服务
-                    </Text> 
-        }
+        // if(category==1&&status_fixed==1){
+        //     return  <Text 
+        //                 onPress={()=>this.changeEvent(signId)}
+        //                 style={styles.first_button}
+        //             >
+        //                 请求服务
+        //             </Text> 
+        // }
         if(category==1&&status_fixed==2){
             return  <Text style={styles.service}>
                         (等待处置方回应)
@@ -60,20 +60,22 @@ export default class ComponentInfo extends Component{
         //     this.props.navigation.navigate('trace')
         // }
     }
-    //进入请求服务页
-    changeEvent(signId){
-        // console.log(signId)
-        this.props.navigate('service',{signId:signId})
-    }
+    // //进入请求服务页
+    // changeEvent(signId){
+    //     // console.log(signId)
+    //     this.props.navigate('service',{signId:signId})
+    // }
     render(){
         const {signId,status_fixed,category}=this.props
         console.log(status_fixed)
         const InfoData=this.props.data
+        const order_allData=this.props.order_allData;
+        console.log(order_allData)
         console.log(this.props.data)
         return (
             <View style={styles.dispose_Info}>
                 <View style={{flexDirection:'row'}}>
-                    {this.state.category==1?
+                    {category==1?
                         <Text style={styles.componentName}>
                             处置企业：
                         </Text>
@@ -91,7 +93,7 @@ export default class ComponentInfo extends Component{
                     {this.startService(signId,status_fixed,category)}
                 </View>
                 <Text style={styles.infomation_item}>
-                    成交价格：￥1000.00
+                    成交价格：￥{order_allData.price}
                 </Text>
                 <View style={styles.userInfo}>
                     <Text style={styles.username}>
@@ -113,11 +115,31 @@ export default class ComponentInfo extends Component{
                     </Text>
                 </View>  
                 
-                <View style={styles.infomation_item}>
+                <View style={styles.infomation_item,{flexDirection:'row',marginTop:16}}>
                     <Text style={{fontSize:15}}>
                         相关图片：
                     </Text>
-                    <Image />
+                    <View style={{flex:1,flexDirection:'row',flexWrap:"wrap"}}>
+                        {/* {imageArr.map((item,index)=>{
+                            const  image_item='http://39.104.72.185:7001'+item
+                            return(
+                                <View style={{marginLeft:5,marginTop:4}} key={index}>
+                                    <Image 
+                                        style={{width:width*0.135,height:width*0.135,borderWidth:1}}
+                                        source={{uri:image_item}}
+                                        />
+                                </View>
+                            )
+                         })
+                        } */}
+                        <View style={{marginLeft:5,marginTop:4}}>
+                            <Image style={{width:width*0.135,height:width*0.135,borderWidth:1}}/>
+                        </View>
+                        {/* <View style={{marginLeft:5,marginTop:4}}>
+                            <Image style={{width:width*0.135,height:width*0.135,borderWidth:1}}/>
+                        </View> */}
+                    </View>
+                    
                 </View>
             </View> 
         )

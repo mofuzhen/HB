@@ -105,11 +105,20 @@ export default class OrderList extends Component{
     }
     render(){
         return(
+            this.props.detailsData.length?
                 <FlatList
                     data={this.props.detailsData}
                     renderItem={(data)=>this.renderItem(data)}
                     keyExtractor={(item,index)=>index.toString()}
-                    />        
+                    />   
+                    :
+                    <Text style={{textAlign:'center',fontSize:20,
+                        borderTopWidth:7, borderTopColor:'#D7D7D7',
+                        paddingTop:5
+                    }}>
+                        No Data
+                    </Text>   
+                       
         )
     }
     // componentDidMount(){

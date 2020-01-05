@@ -15,6 +15,7 @@ export  default class Details extends Component{
             status_sign:1, //标的状态
             signId:1, //订单id
             auction:{}, //企业列表item(订单列表)
+            order_allData:{}, //单个订单的整体数据
             auctions:{},  //单个订单的auction
             detailsData:[], //企业列表
             dispose_company:{}, //处置方公司信息
@@ -60,22 +61,43 @@ export  default class Details extends Component{
     this.getComponentInfo=this.getComponentInfo.bind(this)
     this.getStatus=this.getStatus.bind(this)
     this.getSplitOrder=this.getSplitOrder.bind(this)
+    // this.changeService=this.changeService.bind(this)
     // this.checkTracking=this.checkTracking.bind(this)
     }
     //订单拆分或查看处置跟踪
     getSplitOrder(){
-        const {status_fixed,category}=this.state;
-        if(category==1&&status_fixed!=1){
+        const {status_fixed,category,signId}=this.state;
+        // if(category==1&&status_fixed==2){
+        //     return(
+        //         <Text 
+        //             onPress={()=>this.checkTracking(this)}
+        //             style={styles.first_button}
+        //         >
+        //             查看处置跟踪
+        //         </Text> 
+        //     )
+        // }
+        if(category==1&&status_fixed==2){
             return(
                 <Text 
-                    onPress={()=>this.checkTracking(this)}
+                    onPress={this.changeService.bind(this,signId)}
                     style={styles.first_button}
                 >
-                    查看处置跟踪
+                    请求服务    
                 </Text> 
             )
         }
-        if(category==2&&status_fixed==2){
+        // if(category==2&&status_fixed==2){
+        //     return(
+        //         <Text 
+        //             onPress={this.changeEvent}
+        //             style={styles.first_button}
+        //         >
+        //             订单拆分
+        //         </Text> 
+        //     )
+        // }
+        if(category==2&&status_fixed==3){
             return(
                 <Text 
                     onPress={this.changeEvent}
@@ -84,27 +106,22 @@ export  default class Details extends Component{
                     订单拆分
                 </Text> 
             )
-        }
-        if(category==2&&status_fixed==3){
-            return(
-                <Text 
-                    onPress={()=>this.checkTracking(this)}
-                    style={styles.first_button}
-                >
-                    查看处置跟踪
-                </Text> 
-            )
         }   
         if(category==2&&status_fixed==4){
             return(
                 <Text 
-                    onPress={()=>this.checkTracking(this)}
+                    onPress={this.changeEvent}
                     style={styles.first_button}
                 >
-                    查看处置跟踪    
+                    订单拆分    
                 </Text> 
             )
         }
+    }
+    //进入请求服务页
+    changeService(signId){
+        // console.log(signId)
+        this.props.navigation.navigate('service',{signId:signId})
     }
     //订单状态   
     getStatus(){
@@ -245,7 +262,7 @@ export  default class Details extends Component{
     }
     //公司信息
     getComponentInfo(){
-        const {category,dispose_company,product_company,status_fixed} =this.state
+        const {category,dispose_company,product_company,status_fixed,order_allData} =this.state
         if(category==1){    
             return <ComponentInfo 
                         data={dispose_company} 
@@ -253,6 +270,7 @@ export  default class Details extends Component{
                         status_fixed={status_fixed}
                         signId={this.state.signId}
                         navigate={this.props.navigation.navigate}
+                        order_allData={order_allData}
                     />
         }
         if(category==2){
@@ -262,6 +280,7 @@ export  default class Details extends Component{
                         status_fixed={status_fixed}
                         signId={this.state.signId}
                         navigate={this.props.navigation.navigate}
+                        order_allData={order_allData}
                     />
         }
     }
@@ -276,9 +295,11 @@ export  default class Details extends Component{
         })
         //  console.log(category)
         requests.get(`/gzapi/order/get?id=${signId}`).then(res=>{
+            const order_allData=res.data //单个订单的整体数据
             const auctions =res.data.auction;              //从单个订单接口拿的auction
             this.setState({
-                auctions:auctions
+                auctions:auctions,
+                order_allData:order_allData
             })
             console.log(res.data)
             if(category==2){
@@ -303,7 +324,11 @@ export  default class Details extends Component{
     }
     //需求详情
     getRequireInfo(){
-        return(
+        const {auctions}=this.state;
+        console.log(auctions)   
+        if(auctions.pointMap){
+            const {p_name,c_name,a_name}=auctions.pointMap[0].point;
+            return(
                 <View>
                      <View style={styles.infomation}>
                          <View style={styles.header}>
@@ -314,21 +339,22 @@ export  default class Details extends Component{
                             
                          </View>
                          <Text style={styles.infomation_item}>
-                             订单类型：2
+                             订单类型：
                          </Text>
                          <Text style={styles.infomation_item}>
-                             订单编号：sn0001
+                             订单编号：{auctions.sn}
                          </Text>
                          <Text style={styles.infomation_item}>
-                             处置信息：负责组装生产配套
+                             处置信息：
                          </Text>
                          <Text style={styles.infomation_item}>
-                             处置地点：江西省赣州市章贡区
+                             处置地点：{p_name} {c_name} {a_name}
                          </Text>
                      </View>
                     {this.getComponentInfo()} 
                 </View> 
-        )
+            )
+        }
     }
     //服务单列表请求
     getServiceList(){
@@ -655,7 +681,6 @@ export  default class Details extends Component{
 
         
         const {auction,detailsData}=this.state;
-        const pointMap= auction.pointMap;
         // console.log(pointMap)
         // for(var i=0;i<pointMap.length;i++){
         //     var item=pointMap[i]

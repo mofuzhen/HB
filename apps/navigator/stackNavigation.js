@@ -2,8 +2,6 @@ import React from 'react'
 import {View,Dimensions} from 'react-native'
 import {createAppContainer,createSwitchNavigator} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-// import {connect} from 'react-redux'
-// import {createReactNavigationReduxMiddleware, createReduxContainer} from 'react-navigation-redux-helpers';
 import businessList from '../page/business/businessList';
 import businessDetails from '../page/business/businessDetails';
 import login from '../page/login'
@@ -13,10 +11,6 @@ import a from '../page/business/businessDetails/a'
 import service from '../page/order/details/service'
 import splitOrder from '../page/order/details/splitOrder'   
 import splitOrderInfo from '../page/order/details/splitOrderInfo'
-import arriveDispose from '../page/order/trace/arriveDispose'
-import leaveDispose from '../page/order/trace/leaveDispose'
-import finishDispose from '../page/order/trace/finishDispose'
-import truckloading from '../page/order/trace/truckloading'
 import dispose from '../page/order/trace/dispose'
 import map from '../page/order/details/map'
 import aa from '../page/aa'
@@ -31,12 +25,18 @@ const Initrouter  = createStackNavigator ({
     }
 })
 const MainNavigator  = createStackNavigator ({
-    login:{
-        screen:login,
+    // login:{
+    //     screen:login,
+    //     navigationOptions: {
+    //         header: null,// 可以通过将header设为null 来禁用StackNavigator的Navigation Bar
+    //     }
+    // }, 
+    businessList:{
+        screen:businessList,
         navigationOptions: {
-            header: null,// 可以通过将header设为null 来禁用StackNavigator的Navigation Bar
+            header: null,
         }
-    }, 
+    },
     dispose:{
         screen:dispose,
         navigationOptions:({navigation}) => ({
@@ -44,7 +44,7 @@ const MainNavigator  = createStackNavigator ({
                 height:height*0.07
               },
             headerRight: <View/>,
-            headerTitle: `${navigation.state.params.title}` ,
+            headerTitle: `${navigation.state.params &&navigation.state.params.title}` ,
             headerTintColor: '#333333',
                 headerTitleStyle: { 
                 flex:1,
@@ -53,13 +53,6 @@ const MainNavigator  = createStackNavigator ({
             }
         })
     },
-    businessList:{
-        screen:businessList,
-        navigationOptions: {
-            header: null,
-        }
-    },
-    
     orderList:{
         screen:orderList,
         navigationOptions: {
@@ -81,59 +74,6 @@ const MainNavigator  = createStackNavigator ({
                 fontSize:20
               },
         })
-    },
-    
-    arriveDispose:{
-        screen:arriveDispose,
-        navigationOptions:{
-            headerRight: <View/>,
-            headerTitle: '到达处置点' ,
-            headerTintColor: '#333333',
-                headerTitleStyle: { 
-                flex:1,
-                textAlign:'center',
-                fontSize:25
-            }
-        }
-    },
-    leaveDispose:{
-        screen:leaveDispose,
-        navigationOptions:{
-            headerRight: <View/>,
-            headerTitle: '离开处置点' ,
-            headerTintColor: '#333333',
-                headerTitleStyle: { 
-                flex:1,
-                textAlign:'center',
-                fontSize:25
-            }
-        }
-    },
-    finishDispose:{
-        screen:finishDispose,
-        navigationOptions:{
-            headerRight: <View/>,
-            headerTitle: '处置完成' ,
-            headerTintColor: '#333333',
-                headerTitleStyle: { 
-                flex:1,
-                textAlign:'center',
-                fontSize:25
-            }
-        }
-    },
-    truckloading:{
-        screen:truckloading,
-        navigationOptions:{
-            headerRight: <View/>,
-            headerTitle: '装车' ,
-            headerTintColor: '#333333',
-                headerTitleStyle: { 
-                flex:1,
-                textAlign:'center',
-                fontSize:25
-            }
-        }
     },
     businessDetails:{
         screen:businessDetails,
@@ -232,8 +172,13 @@ const MainNavigator  = createStackNavigator ({
 });
 
 export const RootNavigator = createAppContainer(createSwitchNavigator({
-    Init: Initrouter,
-    Main: MainNavigator,
-}));
+    // Init: Initrouter,
+    // Main: MainNavigator,
+    Auth:{
+        screen:Initrouter
+    },
+    App:MainNavigator
+}
+));
 const App =createAppContainer(RootNavigator)
 export default App 
