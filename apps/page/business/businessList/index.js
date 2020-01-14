@@ -21,9 +21,10 @@ export default class BusinessList extends Component{
             error: false,
             errorInfo: "",
             // detailsData:[], //企业订单列表
-            showFoot:0, // 控制foot， 0：隐藏footer  1：已加载完成,没有更多数据   2 ：显示加载中
+            showFoot:1, // 控制foot， 0：隐藏footer  1：已加载完成,没有更多数据   2 ：显示加载中
             isRefreshing:false,//下拉控制,
             Is_exit:false, //显示退出按钮
+            icon:'', //个人头像
             
         }
         this.infomation=this.infomation.bind(this)
@@ -44,8 +45,9 @@ export default class BusinessList extends Component{
             name:name,
             logos:logos,
             category:category,
+            icon:this.state.icon,
             refresh:function(){
-                // this.init;   
+                this.init;
                 console.log(1)
             }
         })
@@ -56,7 +58,8 @@ export default class BusinessList extends Component{
             id:id,
             name:name,
             category:category,
-            logos:logos
+            logos:logos,
+            icon:this.state.icon
         })
     }
     //公司列表中每个公司的实名认证状态
@@ -97,7 +100,7 @@ export default class BusinessList extends Component{
         const item=data.item;
         console.log(item)
         const {id,category,is_verify,logo,name} =item;
-        const logos='http://39.104.72.185:7001'+logo
+        const logos='http://39.100.51.78:7001'+logo
         // console.log(logos)
         // console.log(logo)
         return  (
@@ -144,6 +147,7 @@ export default class BusinessList extends Component{
         this.props.navigation.navigate('login')
     }
     render(){
+        const {icon}=this.state;
         return(
             <View style={{flex:1}}>
                 <View style={styles.businessList}>
@@ -161,7 +165,7 @@ export default class BusinessList extends Component{
                         <TouchableOpacity onPress={this.handleClick}>
                             <Image 
                                 style={styles.username} 
-                                source={{uri:'http://39.104.72.185:7001/public/upload/img/1571757966042.png'}}
+                                source={{uri:icon}}
                             />
                         </TouchableOpacity>
                         {this.state.Is_exit?
@@ -174,7 +178,7 @@ export default class BusinessList extends Component{
                                 <Text style={{textAlign:'center',paddingTop:height*0.008}}
                                 onPress={this.handleExitLogin.bind(this)}
                                 >
-                                    退出登录
+                                    退出
                                 </Text>
                             </View>
                             :
@@ -190,78 +194,109 @@ export default class BusinessList extends Component{
                     }  
                         
                 </View>
-                {
+                <FlatList 
+                     data={this.state.listData}
+                     renderItem={(data)=>this.renderItem(data)}
+                     ListFooterComponent={this._renderFooter.bind(this)}
+                     />
+                {/* {
                     this.loadingData()
-                }
+                } */}
             </View>                
         )
     }
-    loadingData(){
-        //第一次加载等待的view
-        if (this.state.isLoading && !this.state.error) {
-            return this.renderLoadingView();
-        } else if (this.state.error) {
-            //请求失败view
-            return this.renderErrorView();
-        }
-        //加载数据
-        return (
-                <FlatList 
-                    data={this.state.listData}
-                    renderItem={(data)=>this.renderItem(data)}
-                    ListFooterComponent={this._renderFooter.bind(this)}
-                    onEndReached={this._onEndReached.bind(this)}
-                    onEndReachedThreshold={0.1}
-                    // ItemSeparatorComponent={this._separator}
-                    keyExtractor={(item,index)=>index.toString()}
-                    //为刷新设置颜色
-                    refreshControl={ 
-                        <RefreshControl
-                            refreshing={this.state.isRefreshing}
-                            onRefresh={this.handleRefresh.bind(this)}//因为涉及到this.state
-                            colors={['#ff0000', '#00ff00','#0000ff','#3ad564']}
-                            progressBackgroundColor="#ffffff"
-                        />
-                }
-                /> 
+    _renderFooter(){
+        if(this.state.showFoot===0){
+            return(
+                <View style={{height:30,alignItems:'center',justifyContent:'flex-start',}}>
+                    <Text style={{color:'#999999',fontSize:14,marginTop:5,marginBottom:5,}}>
+                        没有更多数据了
+                    </Text>
+                </View>
             )
+        }   
+        if(this.state.showFoot===1){
+            return(
+                <View>
+                    <Text></Text>
+                </View>   
+            )
+        }
     }
+    // loadingData(){
+    //     //第一次加载等待的view
+    //     if (this.state.isLoading && !this.state.error) {
+    //         return this.renderLoadingView();
+    //     } else if (this.state.error) {
+    //         //请求失败view
+    //         return this.renderErrorView();
+    //     }
+    //     //加载数据
+    //     return (
+    //             <FlatList 
+    //                 data={this.state.listData}
+    //                 renderItem={(data)=>this.renderItem(data)}
+    //                 ListFooterComponent={this._renderFooter.bind(this)}
+    //                 onEndReached={this._onEndReached.bind(this)}
+    //                 onEndReachedThreshold={0.1}
+    //                 // ItemSeparatorComponent={this._separator}
+    //                 keyExtractor={(item,index)=>index.toString()}
+    //                 //为刷新设置颜色
+    //                 refreshControl={ 
+    //                     <RefreshControl
+    //                         refreshing={this.state.isRefreshing}
+    //                         onRefresh={this.handleRefresh.bind(this)}//因为涉及到this.state
+    //                         colors={['#ff0000', '#00ff00','#0000ff','#3ad564']}
+    //                         progressBackgroundColor="#ffffff"
+    //                     />
+    //             }
+    //             /> 
+    //         )
+    // }
     getListData(){
-        requests.get(`/gzapi/member/company?page=${this.state.page}`).then(res=>{
+        requests.get(`/gzapi/member/company`).then(res=>{
             console.log(res)
             let data=res.data;
-            let dataBlob = [];//这是创建该数组，目的放存在key值的数据，就不会报黄灯了
-                let i = itemNo;
-                data&&data.map(function (item) {      
-                    dataBlob.push({
-                        // key: i,
-                        logo: item.logo,
-                        is_verify: item.is_verify,
-                        introduction:item.introduction,
-                        name:item.name
-                    })
-                    i++;
-                });
-                itemNo = i;
-                let foot = 0;
-                if(this.state.page>=totalPage){
-                    foot = 1;//listView底部显示没有更多数据了
-                }
+            // let dataBlob = [];//这是创建该数组，目的放存在key值的数据，就不会报黄灯了
+            //     let i = itemNo;
+            //     data&&data.map(function (item) {      
+            //         dataBlob.push({
+            //             // key: i,
+            //             logo: item.logo,
+            //             is_verify: item.is_verify,
+            //             introduction:item.introduction,
+            //             name:item.name
+            //         })
+            //         i++;
+            //     });
+            //     itemNo = i;
+            //     let foot = 0;
+            //     if(this.state.page>=totalPage){
+            //         foot = 1;//listView底部显示没有更多数据了
+            //     }
+            //     this.setState({
+            //         //复制数据源
+            //       //  dataArray:this.state.dataArray.concat(dataBlob),
+            //         // dataArray:[...this.state.dataArray,...dataBlob],
+            //         isLoading: false,
+            //         showFoot:foot,
+            //         isRefreshing:false,
+            //         listData:data
+            //     });
+            //     data = null;//重置为空
+            //     dataBlob = null;
+            if(data!=[]){
                 this.setState({
-                    //复制数据源
-                  //  dataArray:this.state.dataArray.concat(dataBlob),
-                    // dataArray:[...this.state.dataArray,...dataBlob],
-                    isLoading: false,
-                    showFoot:foot,
-                    isRefreshing:false,
-                    listData:this.state.listData.concat(data)
-                });
-                data = null;//重置为空
-                dataBlob = null;
-            
-            // this.setState({
-            //     listData:data
-            // })
+                    showFoot:0
+                })
+            }else{
+                this.setState({
+                    showFoot:1
+                })
+            }
+            this.setState({
+                listData:data,
+            })
         })
         .catch((error) => {
             this.setState({
@@ -274,6 +309,11 @@ export default class BusinessList extends Component{
     getUserInfo(){
         requests.get('/gzapi/member/get').then(res=>{
             console.log(res)
+            const icon='http://39.100.51.78:7001'+res.data.icon
+            console.log(icon)
+            this.setState({
+                icon:icon
+            })
         }).catch(err=>{
             console.log(err)
         })
@@ -285,83 +325,80 @@ export default class BusinessList extends Component{
     shouldComponentUpdate() {
         return true
     }
-    handleRefresh = () => {
-        this.setState({
-            page:1,
-            isRefreshing:true,//tag,下拉刷新中，加载完全，就设置成flase
-            dataArray:[]
-        });
-        this.getListData()
-    }
-    //加载等待页
-    renderLoadingView() {
-        return (
-            <View style={styles.container}>
-                <ActivityIndicator
-                    animating={true}
-                    color='blue'
-                    size="large"
-                />
-            </View>
-        );
-    }
-    //加载失败view
-    renderErrorView() {
-        return (
-            <View style={styles.container}>
-                <Text>
-                    {this.state.errorInfo}
-                </Text>
-            </View>
-        );
-    }
-    // _separator(){
-    //     return <View style={{height:1,backgroundColor:'#999999'}}/>;
+    // handleRefresh = () => {
+    //     this.setState({
+    //         page:1,
+    //         isRefreshing:true,//tag,下拉刷新中，加载完全，就设置成flase
+    //         dataArray:[]
+    //     });
+    //     this.getListData()
     // }
-    _renderFooter(){
-        if (this.state.showFoot === 1) {
-            return (
-                <View style={{height:30,alignItems:'center',justifyContent:'flex-start',}}>
-                    <Text style={{color:'#999999',fontSize:14,marginTop:5,marginBottom:5,}}>
-                        没有更多数据了
-                    </Text>
-                </View>
-            );
-        } else if(this.state.showFoot === 2) {
-            return (
-                <View style={styles.footer}>
-                    <ActivityIndicator />
-                    <Text>正在加载更多数据...</Text>
-                </View>
-            );
-        } else if(this.state.showFoot === 0){
-            return (
-                <View style={styles.footer}>
-                    <Text></Text>
-                </View>
-            );
-        }
-    }
-    //当距离底部不足的距离时调用
-    _onEndReached(){
-        //如果是正在加载中或没有更多数据了，则返回
-        if(this.state.showFoot != 0 ){
-            return ;
-        }
-        //如果当前页大于或等于总页数，那就是到最后一页了，返回
-        if((this.state.page!=1) && (this.state.page>=totalPage)){
-            return;
-        } else {
-            this.state.page++;
-        }
-        //底部显示正在加载更多数据
-        this.setState({showFoot:2});
-        //获取数据，在componentDidMount()已经请求过数据了
-    if (this.state.page>1)
-        {
-            this.getListData();
-        }
-    }
+    // //加载等待页
+    // renderLoadingView() {
+    //     return (
+    //         <View style={styles.container}>
+    //             <ActivityIndicator
+    //                 animating={true}
+    //                 color='blue'
+    //                 size="large"
+    //             />
+    //         </View>
+    //     );
+    // }
+    // //加载失败view
+    // renderErrorView() {
+    //     return (
+    //         <View style={styles.container}>
+    //             <Text>
+    //                 {this.state.errorInfo}
+    //             </Text>
+    //         </View>
+    //     );
+    // }
+    // _renderFooter(){
+    //     if (this.state.showFoot === 1) {
+    //         return (
+    //             <View style={{height:30,alignItems:'center',justifyContent:'flex-start',}}>
+    //                 <Text style={{color:'#999999',fontSize:14,marginTop:5,marginBottom:5,}}>
+    //                     没有更多数据了
+    //                 </Text>
+    //             </View>
+    //         );
+    //     } else if(this.state.showFoot === 2) {
+    //         return (
+    //             <View style={styles.footer}>
+    //                 <ActivityIndicator />
+    //                 <Text>正在加载更多数据...</Text>
+    //             </View>
+    //         );
+    //     } else if(this.state.showFoot === 0){
+    //         return (
+    //             <View style={styles.footer}>
+    //                 <Text></Text>
+    //             </View>
+    //         );
+    //     }
+    // }
+    // //当距离底部不足的距离时调用
+    // _onEndReached(){
+    //     //如果是正在加载中或没有更多数据了，则返回
+    //     if(this.state.showFoot != 0 ){
+    //         return ;
+    //     }
+    //     //如果当前页大于或等于总页数，那就是到最后一页了，返回
+    //     if((this.state.page!=1) && (this.state.page>=totalPage)){
+    //         return;
+    //     } else {
+    //         this.state.page++;
+    //     }
+    //     //底部显示正在加载更多数据
+    //     this.setState({showFoot:2});
+    //     //获取数据，在componentDidMount()已经请求过数据了
+    // if (this.state.page>1)
+    //     {
+    //         this.getListData();
+    //     }
+    // }
    
 }
 
@@ -398,7 +435,6 @@ const styles = StyleSheet.create({
     username: {
         width:width*0.12,
         height:height*0.065,
-        backgroundColor:'yellow',
         resizeMode:'contain'
     },
     component: {

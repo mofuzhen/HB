@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import {Text,View,StyleSheet,Dimensions,Image,FlatList,TouchableOpacity,ScrollView} from 'react-native'
+import {Text,View,StyleSheet,Dimensions,Image,FlatList,TouchableOpacity,DeviceEventEmitter,ScrollView} from 'react-native'
 // import { ScrollView } from 'react-native-gesture-handler';
 
 var {width,height}=Dimensions.get('window');
@@ -11,7 +11,7 @@ export default class OrderList extends Component{
         super(props);
         this.state={
             // status_sign:this.props.status_sign
-
+            show:true //显示No data
         }
         this.handleOrder=this.handleOrder.bind(this)
     }
@@ -64,6 +64,7 @@ export default class OrderList extends Component{
                 detailsData:detailsData,
                 status_sign:status_sign
             })
+            DeviceEventEmitter.emit('change')
         // } else if(category==3||category==4){
             // this.props.navigation.navigate('trace')
         // }
@@ -103,26 +104,63 @@ export default class OrderList extends Component{
         )
         
     }
+    // this.props.detailsData.length?
+    //             <FlatList
+    //                 data={this.props.detailsData}
+    //                 renderItem={(data)=>this.renderItem(data)}
+    //                 keyExtractor={(item,index)=>index.toString()}
+    //                 />   
+    //                 :
+    //                 <Text style={{textAlign:'center',fontSize:20,
+    //                     borderTopWidth:7, borderTopColor:'#D7D7D7',
+    //                     paddingTop:5
+    //                 }}>
+    //                     No Data
+    //                 </Text> 
     render(){
-        return(
-            this.props.detailsData.length?
+        // var renderItem=this.renderItem();
+        return(  
+            this.props.detailsData.length<=0?
+                <Text style={{textAlign:'center',fontSize:20,
+                    borderTopWidth:7, borderTopColor:'#D7D7D7',
+                    paddingTop:5
+                }}>
+                    No Data
+                </Text> 
+                :
                 <FlatList
                     data={this.props.detailsData}
                     renderItem={(data)=>this.renderItem(data)}
                     keyExtractor={(item,index)=>index.toString()}
-                    />   
-                    :
-                    <Text style={{textAlign:'center',fontSize:20,
-                        borderTopWidth:7, borderTopColor:'#D7D7D7',
-                        paddingTop:5
-                    }}>
-                        No Data
-                    </Text>   
-                       
+                    />             
         )
     }
-    // componentDidMount(){
-    //     console.log(this.props.detailsData)
+    componentDidMount(){
+        // if(this.props.detailsData!=[]){
+        //     this.setState({
+        //         show:false
+        //     })
+        // }
+    }
+    // renderItem(){
+    //     if(this.state.show){
+    //         return(     
+    //             <Text style={{textAlign:'center',fontSize:20,
+    //                 borderTopWidth:7, borderTopColor:'#D7D7D7',
+    //                 paddingTop:5
+    //             }}>
+    //                 No Data
+    //             </Text> 
+    //         )
+    //     }else{
+    //         return(
+    //             <FlatList
+    //                 data={this.props.detailsData}
+    //                 renderItem={(data)=>this.renderItem(data)}
+    //                 keyExtractor={(item,index)=>index.toString()}
+    //                 /> 
+    //         )
+    //     }  
     // }
 }
 
@@ -156,7 +194,7 @@ const styles=StyleSheet.create({
     img: {
         width:width*0.21,
         height:width*0.21,
-        backgroundColor:'#999999'
+        // backgroundColor:'#999999'
     },
     project: {
         flex:1,

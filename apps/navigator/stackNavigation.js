@@ -49,7 +49,7 @@ const MainNavigator  = createStackNavigator ({
                 headerTitleStyle: { 
                 flex:1,
                 textAlign:'center',
-                fontSize:25
+                fontSize:23
             }
         })
     },
@@ -71,7 +71,7 @@ const MainNavigator  = createStackNavigator ({
               headerTitleStyle: { 
                   flex:1,
                 textAlign:'center',
-                fontSize:20
+                fontSize:23
               },
         })
     },
@@ -117,7 +117,7 @@ const MainNavigator  = createStackNavigator ({
               headerTitleStyle: { 
                 flex:1,
                 textAlign:'center',
-                fontSize:25
+                fontSize:23
             }
         }
     },
@@ -133,7 +133,7 @@ const MainNavigator  = createStackNavigator ({
               headerTitleStyle: { 
                 flex:1,
                 textAlign:'center',
-                fontSize:25
+                fontSize:23
             }
         }
     },
@@ -149,7 +149,7 @@ const MainNavigator  = createStackNavigator ({
               headerTitleStyle: { 
                 flex:1,
                 textAlign:'center',
-                fontSize:25
+                fontSize:23
             }
         }
     },
@@ -165,7 +165,7 @@ const MainNavigator  = createStackNavigator ({
                 headerTitleStyle: { 
                 flex:1,
                 textAlign:'center',
-                fontSize:25
+                fontSize:23
             }
         }
     }

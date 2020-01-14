@@ -1,11 +1,10 @@
 import React,{Component} from 'react';
-import {View,Text,StyleSheet,Dimensions} from 'react-native'
+import {View,Text,StyleSheet,Dimensions,DeviceEventEmitter} from 'react-native'
 import {requests} from '../../../http'
 import ComponentInfo from '../../../component/componentInfo';
 import { ScrollView } from 'react-native-gesture-handler';
 import Tracing from '../../../component/tracing';
-// import { Icon, Steps, WingBlank } from '@ant-design/react-native';
-// const Step = Steps.Step;
+import moment from 'moment';
 
 const {width,height} =Dimensions.get('window')
 export  default class Details extends Component{
@@ -37,24 +36,18 @@ export  default class Details extends Component{
             service_all:[],//处置跟踪数据列表
             step_all:{}, //跟踪列表的step
             step:{}, //每个节点的step
-            service_Id:1, //单个服务单Id
+            service_Id:1, //服务单Id
             steps1:[], //服务列表的名字、是否完成
             is_finish_A:'', //流程的当前节点是否完成
             content:[], //当前节点的content内容
             form:[], //当前节点的form内容
             name:'', //节点名称
             follow_id:'', //处置跟踪id
-            // steps1: [
-            //     { title: 'Finished', description: 'This is description',status:'process' },
-            //     { title: 'Finished', description: 'This is description',status:'process'  },
-            //     { title: 'Finished', description: 'This is description',status:'process' },
-            //     { title: 'In Progress', description: 'This is description',status:'wait'  },
-            //     { title: 'In Progress', description: 'This is description',status:'finish'  },
-            //     { title: 'In Progress', description: 'This is description',status:'finish'  },
-            //     { title: 'In Progress', description: 'This is description' ,status:'finish' },
-            //     // { title: 'Waiting', description: 'This is description' ,statue:'process' },
-            //   ],
-            //   is_finish:1 //某节点是否完成
+            shop_name:'', //处置商品
+            point:{}, //获取处置地点
+            service_status:1,
+            service_data:'', //gzapi/follow/list里的服务单数据
+            item:null //
         };
     this.changeEvent=this.changeEvent.bind(this);
     this.handleDetails=this.handleDetails.bind(this)   
@@ -67,17 +60,17 @@ export  default class Details extends Component{
     //订单拆分或查看处置跟踪
     getSplitOrder(){
         const {status_fixed,category,signId}=this.state;
-        // if(category==1&&status_fixed==2){
-        //     return(
-        //         <Text 
-        //             onPress={()=>this.checkTracking(this)}
-        //             style={styles.first_button}
-        //         >
-        //             查看处置跟踪
-        //         </Text> 
-        //     )
-        // }
         if(category==1&&status_fixed==2){
+            return(
+                <Text 
+                    onPress={()=>this.checkTracking(this)}
+                    style={styles.first_button}
+                >
+                    查看处置跟踪
+                </Text> 
+            )
+        }
+        if(category==1&&status_fixed==3){
             return(
                 <Text 
                     onPress={this.changeService.bind(this,signId)}
@@ -97,6 +90,16 @@ export  default class Details extends Component{
         //         </Text> 
         //     )
         // }
+        if(category==2&&status_fixed==2){
+            return(
+                <Text 
+                    onPress={this.changeEvent}
+                    style={styles.first_button}
+                >
+                    订单拆分
+                </Text> 
+            )
+        }
         if(category==2&&status_fixed==3){
             return(
                 <Text 
@@ -107,16 +110,16 @@ export  default class Details extends Component{
                 </Text> 
             )
         }   
-        if(category==2&&status_fixed==4){
-            return(
-                <Text 
-                    onPress={this.changeEvent}
-                    style={styles.first_button}
-                >
-                    订单拆分    
-                </Text> 
-            )
-        }
+        // if(category==2&&status_fixed==4){
+        //     return(
+        //         <Text 
+        //             onPress={this.changeEvent}
+        //             style={styles.first_button}
+        //         >
+        //             订单拆分    
+        //         </Text> 
+        //     )
+        // }
     }
     //进入请求服务页
     changeService(signId){
@@ -153,6 +156,7 @@ export  default class Details extends Component{
         
         this.setState({
             serviceNumberIndex:item.id,
+            item:item
         })
         // this.setState({
         //     service_Id:serviceIds
@@ -165,15 +169,33 @@ export  default class Details extends Component{
         this.setState({
             service_Id:service_Id //之所以更新 是要用于获取跟踪流程所有坐标
         })
+        requests.get(`/gzapi/service/get?id=${service_Id}`).then(res=>{
+            console.log(res)
+            const shop_name=res.data.detail.product.name;
+            const service_status=res.data.status
+            console.log(service_status)
+            this.setState({
+                shop_name:shop_name,
+                service_status:service_status
+            },()=>console.log(this.state.service_status))
+        }).catch(err=>{
+            console.log(err)
+        })
         requests.get(`/gzapi/follow/list?id=${service_Id}`).then(res=>{
             console.log(res)
-            const service_all=res.data.rows
+            let service_all=res.data.rows;
+            const service_data=res.data.service;
+            const order_time=service_data.order; //订单生成时间
+            const service_time=service_data.ctime; //服务单生成时间
+            // this.setState({
+            //     service_data:service_data
+            // })
             // const id=service_all[0].id;
             // this.setState({
             //     follow_id:id
             // })
 
-            let step_all=[];
+        let step_all=[];
         for(let item of service_all){
             // console.log(item)   
             const is_finish=item.is_finish;
@@ -191,12 +213,23 @@ export  default class Details extends Component{
             console.log(name)
             // const form=JSON.parse(item.step.form)
             step_all.push({name:name,status:is_finish})
-            // console.log(step_all)
-            this.setState({
-                steps1:step_all
-            },()=>console.log(this.state.steps1))
+            // step_all[0]['desc']=moment.utc(order_time).format('YYYY-MM-DD');
+            // step_all[1]['desc']=moment.utc(service_time).format('YYYY-MM-DD');
+            // console.log(step_all)    
         }
-
+            let c=[]
+            c = c.concat([{name:'订单生成',status:'finish'},{name:'生成服务单',status:'finish'}],step_all)
+            console.log(c)
+            c[0]['desc']=moment.utc(order_time).format('YYYY-MM-DD');
+            c[1]['desc']=moment.utc(service_time).format('YYYY-MM-DD');
+        // console.log(step_all)
+        // step_all.splice(0,0,{name:'订单生成',status:'finish'})
+        // step_all.splice(1,1,{name:'生成服务单',status:'finish'})
+        // step_all[0]['desc']=moment.utc(order_time).format('YYYY-MM-DD');
+        // step_all[1]['desc']=moment.utc(service_time).format('YYYY-MM-DD');
+        this.setState({
+            steps1:c
+        },()=>console.log(this.state.steps1))
         //     let steps_all=[];
         //     for(let item of service_all){
         //         steps_all.push({
@@ -251,9 +284,18 @@ export  default class Details extends Component{
         console.log(signId,auctions)
         this.props.navigation.navigate('splitOrder',{
             signId:signId,
-            auctions:auctions
+            auctions:auctions,
+            refresh:()=>{alert(1)}
         })
     }
+    // refresh(){
+    //     let that =this;
+    //     that.init();
+    //     // alert(1)
+    //     // this.handleDetails()
+    //     // this.getServiceList()
+    //     // this.getDisposeList()  
+    // }
     //查看处置跟踪
     checkTracking(){
         this.setState({
@@ -262,7 +304,7 @@ export  default class Details extends Component{
     }
     //公司信息
     getComponentInfo(){
-        const {category,dispose_company,product_company,status_fixed,order_allData} =this.state
+        const {category,dispose_company,product_company,status_fixed,order_allData,auctions} =this.state
         if(category==1){    
             return <ComponentInfo 
                         data={dispose_company} 
@@ -271,6 +313,7 @@ export  default class Details extends Component{
                         signId={this.state.signId}
                         navigate={this.props.navigation.navigate}
                         order_allData={order_allData}
+                        auctions={auctions}
                     />
         }
         if(category==2){
@@ -281,6 +324,7 @@ export  default class Details extends Component{
                         signId={this.state.signId}
                         navigate={this.props.navigation.navigate}
                         order_allData={order_allData}
+                        auctions={auctions}
                     />
         }
     }
@@ -329,111 +373,133 @@ export  default class Details extends Component{
         if(auctions.pointMap){
             const {p_name,c_name,a_name}=auctions.pointMap[0].point;
             return(
-                <View>
+                <ScrollView>
                      <View style={styles.infomation}>
                          <View style={styles.header}>
                              <Text style={styles.infomation_header}>
                                  项目基本信息：({this.getStatus()})
                              </Text>
                              {this.getSplitOrder()}
-                            
                          </View>
                          <Text style={styles.infomation_item}>
-                             订单类型：
-                         </Text>
-                         <Text style={styles.infomation_item}>
                              订单编号：{auctions.sn}
-                         </Text>
-                         <Text style={styles.infomation_item}>
-                             处置信息：
                          </Text>
                          <Text style={styles.infomation_item}>
                              处置地点：{p_name} {c_name} {a_name}
                          </Text>
                      </View>
+                     {this.renderItem()}
                     {this.getComponentInfo()} 
-                </View> 
+                </ScrollView> 
             )
         }
+    }
+    //期望完成时间、请求服务时间
+    renderItem(){
+        const date=this.state.auctions.rtime;
+        return(
+            <View style={{paddingLeft:width*0.05}}>
+                <Text style={styles.infomation_item}>
+                    期望完成时间：{moment.utc(date).format('YYYY-MM-DD')}
+                </Text>
+                <Text style={styles.infomation_item}>
+                    备注：请提前三天电话联系
+                </Text>
+            </View>
+        )
     }
     //服务单列表请求
     getServiceList(){
         const {signId}=this.props.navigation.state.params;
         console.log(signId)
-        requests.get(`/gzapi/service/list?orderId=${signId}`).then(res=>{
+        requests.get(`/gzapi/service/list?orderId=${signId}&isExport=1`).then(res=>{
             console.log(res)
             const rows=res.data.rows;
             //第一个服务单id
-            const service_Id=rows[0].id   
-            this.setState({
-                service_Id:service_Id
-            })
-            //首次渲染的整个跟踪流程
-            requests.get(`/gzapi/follow/list?id=${service_Id}`).then(res=>{
-                console.log(res)
-                const rows=res.data.rows;
-                // const id=rows[0].id;
-                // this.setState({
-                //     follow_id:id
-                // })
-                // const content=JSON.parse(res.data.rows[0].content)
-                // const service_all=res.data.rows
-                // console.log(service_all)   
-                let step_all=[];
-                for(let item of rows){
-                    console.log(item)   
-                    const is_finish=item.is_finish;
+            if(rows[0]){
+                const service_Id=rows[0].id   
+                this.setState({
+                    service_Id:service_Id
+                })
+                requests.get(`/gzapi/service/get?id=${service_Id}`).then(res=>{
+                    console.log(res)
+                    const shop_name=res.data.detail.product.name;
+                    const service_status=res.data.status
+                    this.setState({
+                        shop_name:shop_name,
+                        service_status:service_status
+                    },()=>console.log(this.state.service_status))
+                }).catch(err=>{
+                    console.log(err)
+                })
+                //首次渲染的整个跟踪流程
+                requests.get(`/gzapi/follow/list?id=${service_Id}`).then(res=>{
+                    console.log(res)
+                    const rows=res.data.rows;
+                    const service_data=res.data.service;
+                    // this.setState({
+                    //     service_data:service_data
+                    // })
+                    const order_time=service_data.order; //订单生成时间
+                    const service_time=service_data.ctime; //服务单生成时间 
+                    let step_all=[];
+                    for(let item of rows){
+                        console.log(item)   
+                        const is_finish=item.is_finish;
+                        if(is_finish==1){
+                            is_finish='wait'
+                        }
+                        if(is_finish==2){
+                            is_finish='finish'
+                        }
+                        this.setState({
+                            is_finish:is_finish
+                        })
+                        const name=item.step.name
+                        console.log(name)
+                        // const form=JSON.parse(item.step.form)
+                        step_all.push({name:name,status:is_finish})
+                        // console.log(step_all) 
+                    }
+                    let c=[]
+                    c = c.concat([{name:'订单生成',status:'finish'},{name:'生成服务单',status:'finish'}],step_all)
+                    console.log(c)
+                    c[0]['desc']=moment.utc(order_time).format('YYYY-MM-DD');
+                    c[1]['desc']=moment.utc(service_time).format('YYYY-MM-DD');
+                    this.setState({
+                        steps1:c
+                    },()=>console.log(this.state.steps1))
+                })
+                .catch(err=>{
+                    console.log(err)
+                })
+                //首次渲染的当前跟踪流程
+                requests.get(`/gzapi/follow/current?id=${service_Id}`).then(res=>{
+                    console.log(res)
+                    const id=res.data.id  //跟踪流程id
+                    let is_finish=res.data.is_finish;
+                    console.log(is_finish)
+                    const name=res.data.step.name
+                    const content=JSON.parse(res.data.content)
+                    const form =JSON.parse(res.data.step.form)
+                    this.setState({
+                        content:content,
+                        name:name,
+                        form:form,
+                        follow_id:id
+                    },()=>console.log(this.state.content))
                     if(is_finish==1){
-                        is_finish='wait'
+                        is_finish= 'wait'
+                        this.setState({
+                            is_finish_A:is_finish
+                        },()=>console.log(this.state.is_finish_A))
                     }
                     if(is_finish==2){
-                        is_finish='finish'
+                        is_finish= 'finish'
+                        this.setState({
+                            is_finish_A:is_finish
+                        },()=>console.log(this.state.is_finish_A))
                     }
-                    this.setState({
-                        is_finish:is_finish
-                    })
-                    const name=item.step.name
-                    console.log(name)
-                    // const form=JSON.parse(item.step.form)
-                    step_all.push({name:name,status:is_finish})
-                    console.log(step_all)
-                    this.setState({
-                        steps1:step_all
-                    },()=>console.log(this.state.steps1))
-                }
-                
-            })
-            .catch(err=>{
-                console.log(err)
-            })
-
-            //首次渲染的当前跟踪流程
-            requests.get(`/gzapi/follow/current?id=${service_Id}`).then(res=>{
-                console.log(res)
-                const id=res.data.id  //跟踪流程id
-                let is_finish=res.data.is_finish;
-                console.log(is_finish)
-                const name=res.data.step.name
-                const content=JSON.parse(res.data.content)
-                const form =JSON.parse(res.data.step.form)
-                this.setState({
-                    content:content,
-                    name:name,
-                    form:form,
-                    follow_id:id
-                },()=>console.log(this.state.content))
-                if(is_finish==1){
-                    is_finish= 'wait'
-                    this.setState({
-                        is_finish_A:is_finish
-                    },()=>console.log(this.state.is_finish_A))
-                }
-                if(is_finish==2){
-                    is_finish= 'finish'
-                    this.setState({
-                        is_finish_A:is_finish
-                    },()=>console.log(this.state.is_finish_A))
-                }
             })
             .catch(err=>{
                 console.log(err)
@@ -441,6 +507,7 @@ export  default class Details extends Component{
 
             let flow_id_all=[];
             for(let i=0;i<rows.length;i++){
+                console.log(rows)
                 const item=rows[i]
                 flow_id_all.push({serviceNumber:item.sn,id:i,serviceId:item.id})
                 this.setState({
@@ -455,6 +522,8 @@ export  default class Details extends Component{
             //         service_Id:service_Id
             //     },console.log(this.state.service_Id))
             // }
+            }
+            
         }).catch(err=>{
             console.log(err)
         })
@@ -462,7 +531,7 @@ export  default class Details extends Component{
     //处置跟踪
     getTracing(){
         
-
+        console.log(this.state.serviceTabs)
         // const steps1=this.state.step;
         // console.log(steps1);
         return(
@@ -509,6 +578,10 @@ export  default class Details extends Component{
                     form={this.state.form}
                     name={this.state.name}
                     follow_id={this.state.follow_id}
+                    shop_name={this.state.shop_name}
+                    auctions={this.state.auctions}
+                    service_status={this.state.service_status}
+                    service_data={this.state.service_data}
                     />
                 {/* <ScrollView
                     automaticallyAdjustContentInsets={false}
@@ -550,7 +623,7 @@ export  default class Details extends Component{
 
         //首个服务单号
         if(this.state.serviceTabs.length>0){
-            const ss_id=serviceTabs[0].serviceId;
+            const ss_id=this.state.serviceTabs[0].serviceId;
             requests.get(`/gzapi/follow/list?id=${ss_id}`).then(res=>{
                 console.log(res)
                 // const content=JSON.parse(res.data.rows[0].content)
@@ -590,7 +663,29 @@ export  default class Details extends Component{
     //         console.log(err)
     //     })
     // }
+    componentWillUnmount(){
+        this.subscription.remove();
+        this.subscription_item.remove();
+    }
     componentDidMount(){
+        //监听页面
+        this.subscription=DeviceEventEmitter.addListener('key',(params)=>{
+            this.handleDetails()
+            this.getServiceList()
+            this.getDisposeList() 
+        })
+        this.subscription_item=DeviceEventEmitter.addListener('name',(params)=>{
+            // this.handleDetails()
+            // this.getServiceList()
+            // this.getDisposeList() 
+            const item=this.state.item;
+            if(item!=null){
+                this.changeServiceTab(item)
+            }else{
+                this.getServiceList()
+            }
+        })
+
         const {detailsData,status_sign,status_fixed} =this.props.navigation.state.params
         console.log(detailsData,status_sign)
         this.setState({
@@ -672,12 +767,12 @@ export  default class Details extends Component{
     //     }
     // }
     render(){
-
-        console.log(this.state.is_finish_A)
+        console.log(this.state.service_status)
+        // console.log(this.state.is_finish_A)
         
         // 首次加载的第一个服务单数据
         const {serviceTabs} =this.state;
-        console.log(serviceTabs)
+        // console.log(serviceTabs)
 
         
         const {auction,detailsData}=this.state;

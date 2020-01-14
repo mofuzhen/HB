@@ -54,7 +54,7 @@ export default class Maps extends Component{
        const {data}=this.state;
         return(  
             <WebView source={{
-                uri:`http://39.104.72.185:7001/gzapi/service/map?id=${this.state.service_Id}&&data=encodeURIComponent(JSON.stringify(data))`,
+                uri:`http://39.100.51.78:7001/gzapi/service/map?id=${this.state.service_Id}&&data=encodeURIComponent(JSON.stringify(data))`,
                 headers:{token:this.state.token}
             }}
             ref='webView'

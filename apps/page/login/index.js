@@ -55,8 +55,7 @@ export default class App extends Component {
                 const {code} = res
                 
                    if(code===0){
-                    Alert.alert('发送成功')
-                    
+                    Alert.alert('发送成功')    
                     if(code===10002){
                         Alert.alert('参数错误')
                     }
@@ -213,6 +212,7 @@ export default class App extends Component {
                         const {code,data}=res
                         if(code===0){
                             AsyncStorage.setItem('token',data.token);  //缓存token
+                            this.props.navigation.navigate('businessList')
                         }
                         if(code===10005){
                             Alert.alert('手机验证码错误')
@@ -258,7 +258,7 @@ export default class App extends Component {
                 })
             } 
 
-            // axios.post('http://39.104.72.185:7001/gzapi/stage/ulogin',
+            // axios.post('http://39.100.51.78:7001/gzapi/stage/ulogin',
             // {mobile:this.state.mobile,pwd:this.state.pwd},
             // {
             //     headers: {
@@ -339,7 +339,7 @@ input: {
     justifyContent:'center',
     textAlignVertical:'center',
     height:ScreenHeight*0.09,
-    fontSize:13,
+    fontSize:14,
     color:'#000000',
     paddingVertical: 0
 },
@@ -356,7 +356,7 @@ send: {
 sendItem: {
     justifyContent:'center',
     alignItems:'center',
-    fontSize:13,
+    fontSize:14,
     color:'#000000',
     width:(ScreenWidth-ScreenWidth*0.06*2-10-16*5),   
     borderRightWidth:1,
@@ -367,7 +367,7 @@ sendItem: {
 },
 sendcode: {
     // paddingTop:15,
-    textAlignVertical:'center',
+    lineHeight:ScreenHeight*0.09,
     color:'rgb(90, 162, 70)',
     fontSize:15,
     marginLeft:10,

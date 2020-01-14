@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import {ScrollView,View,Text,Dimensions,TextInput,StyleSheet,Image,TouchableOpacity,ImageBackground} from 'react-native'
+import {ScrollView,View,Text,Dimensions,TextInput,StyleSheet,Image,TouchableOpacity,ImageBackground,DeviceEventEmitter, Alert} from 'react-native'
 import {requests} from '../../../http'
 import ModalDropdown from 'react-native-modal-dropdown';
 import CheckBox from 'react-native-checkbox';
@@ -249,12 +249,16 @@ export default class Dispose extends Component{
     //添加图片
     addOnClickedImage(){
         const options = {
+            title: '选择图片',
+           cancelButtonTitle: '取消',
+            takePhotoButtonTitle: '拍摄',
+            chooseFromLibraryButtonTitle: '选择图片',
             quality: 1.0,
             maxWidth: 500,
             maxHeight: 500,
             storageOptions: {
                 skipBackup: true,
-            },
+            }
             };
         ImagePicker.showImagePicker(options, response => {
             console.log('Response = ', response);
@@ -350,7 +354,9 @@ export default class Dispose extends Component{
             longitude:`${this.state.longitude}`
         }).then(res=>{
             if(res.code===0){
-                this.props.navigation.navigate('details')
+                Alert.alert('提交成功')
+                this.props.navigation.navigate('details');
+                DeviceEventEmitter.emit('name')
             }
         })
         .catch(err=>{
@@ -362,17 +368,19 @@ export default class Dispose extends Component{
     }
     handleKey_0(form){
         const form_0=form[0]
+        console.log(form_0)
         const type=form_0.type
         let arr=[];
+        console.log(form_0.filed)
         switch(type){
             case('text'):
                 return(
                     <View style={styles.info}>
-                        <Text style={{fontSize:17,width:width*0.2}}>
+                        <Text style={{fontSize:16,width:width*0.25}}>
                             {form_0.filed}：
                         </Text>
                         <TextInput
-                            style={[styles.input,{width:width*0.7}]}
+                            style={[styles.input,{width:width*0.65}]}
                             placeholder={form_0.val[0]}
                             onChangeText={text=>{
                                 arr.push(text)
@@ -386,13 +394,13 @@ export default class Dispose extends Component{
             case('content'):
                 return (
                         <Text style={{fontSize:22,textAlign:'center',marginTop:height*0.1,marginBottom:height*0.1}}>
-                        {form_0.datas[0]}
+                        {form_0.filed}
                         </Text>
                     );
             case('image'):
                 return (
                     <View style={{marginBottom:height*0.04,flex:1}}>
-                        <Text style={{fontSize:17,width:width*0.2}}>
+                        <Text style={{fontSize:17,width:width*0.25}}>
                         {form_0.filed}
                         </Text>
                         <TouchableOpacity onPress={()=>this.onPress}>
@@ -408,12 +416,12 @@ export default class Dispose extends Component{
             case('filed'):
                 return(
                     <View style={{flexDirection:'row',marginBottom:height*0.04}}>
-                        <Text style={{fontSize:17,width:width*0.2,marginTop:height*0.02,textAlign:'right'}}>
+                        <Text style={{fontSize:17,width:width*0.25,marginTop:height*0.02,textAlign:'right'}}>
                             {form_0.filed}：
                         </Text>
                         <TouchableOpacity onPress={()=>this.onPress}>
                             <Text 
-                                style={{width:width*0.2,height:height*0.1,borderColor:'#333333',
+                                style={{width:width*0.25,height:height*0.1,borderColor:'#333333',
                                 borderWidth:1,marginLeft:width*0.05
                             }}>
                             </Text>
@@ -431,12 +439,12 @@ export default class Dispose extends Component{
                 return(
                     <View>
                         <View style={styles.info}>
-                            <Text style={{fontSize:17,width:width*0.2}}>
+                            <Text style={{fontSize:17,width:width*0.25}}>
                             {form_1.filed}：
                             </Text>
                             <TextInput  
                                 placeholder={form_1.val[0]}
-                                style={[styles.input,{width:width*0.7}]}
+                                style={[styles.input,{width:width*0.65}]}
                                 onChangeText={text=>{
                                     arr.push(text)
                                     this.setState({
@@ -450,7 +458,7 @@ export default class Dispose extends Component{
             case('filed'):
                 return(
                     <View style={{marginBottom:25,flex:1}}>
-                        <Text style={{fontSize:17,width:width*0.2,marginTop:height*0.02}}>
+                        <Text style={{fontSize:17,width:width*0.25,marginTop:height*0.02}}>
                             {form_1.filed}
                         </Text>
                         <TouchableOpacity onPress={()=>this.onPress}>
@@ -474,12 +482,12 @@ export default class Dispose extends Component{
                 return(
                     <View>
                         <View style={styles.info}>
-                            <Text style={{fontSize:17,width:width*0.2}}>
+                            <Text style={{fontSize:16,width:width*0.25}}>
                             {form_2.filed}：
                         </Text>
                         <TextInput  
                             placeholder={form_2.val[0]}
-                            style={[styles.input,{width:width*0.7}]}
+                            style={[styles.input,{width:width*0.65}]}
                             onChangeText={text=>{
                                 arr.push(text)
                                 this.setState({
@@ -529,12 +537,12 @@ export default class Dispose extends Component{
             return(
                 <View>
                     <View style={styles.info}>
-                        <Text style={{fontSize:17,width:width*0.2}}>    
+                        <Text style={{fontSize:17,width:width*0.25}}>    
                             {form_3.filed}：
                         </Text>
                         <TextInput  
                             placeholder={form_3.val[0]}   
-                            style={[styles.input,{width:width*0.7}]}
+                            style={[styles.input,{width:width*0.65}]}
                             onChangeText={text=>{
                                 arr.push(text)
                                 this.setState({
@@ -556,15 +564,15 @@ export default class Dispose extends Component{
             return(
                 <View>
                     <View style={styles.info,{flexDirection:'row'}}>
-                        <Text style={{fontSize:17,width:width*0.2,color:'#333333'}}>
+                        <Text style={{fontSize:17,width:width*0.25,color:'#333333'}}>
                             {form_4.filed}：
                         </Text>
                         <ModalDropdown 
                             options={form_4.datas} 
                             defaultValue='请选择'
-                            dropdownStyle={{width:width*0.7,height:100}}
+                            dropdownStyle={{width:width*0.65,height:100}}
                             textStyle={{borderWidth:1,fontSize:18,
-                                    width:width*0.7,height:30,color:'#CCCCCC',paddingTop:4,
+                                    width:width*0.65,height:30,color:'#CCCCCC',paddingTop:4,
                                     paddingLeft:100,paddingTop:0.8,borderColor:'#333333',
                                     borderRadius:1
                             }}
@@ -696,7 +704,7 @@ export default class Dispose extends Component{
             <ScrollView 
                 style={styles.container}
                 showsVerticalScrollIndicator={true}
-                overScrollMode={'always'}
+                // overScrollMode={'always'}
             >
                     {form[0]?<View style={{flex:1}}>{this.handleKey_0(form)}</View>:null}
                     {form[1]?<View style={{flex:1}}>{this.handleKey_1(form)}</View>:null}
@@ -705,7 +713,7 @@ export default class Dispose extends Component{
                     {form[4]?<View>{this.handleKey_4(form)}</View>:null}
                     {form[5]?<View>{this.handleKey_5(form)}</View>:null}
                     {form[6]?<View>{this.handleKey_6(form)}</View>:null}
-                <View style={{paddingTop:60,marginLeft:width*0.07,marginRight:width*0.07,height:200}}>
+                <View style={{paddingTop:30,marginLeft:width*0.07,marginRight:width*0.07}}>
                     <Text 
                         style={styles.submit}
                         onPress={this.submit.bind(this,form,data_0,data_1,data_2,data_3,data_4,text,value)}
@@ -725,6 +733,7 @@ const styles=StyleSheet.create({
         flex:1,
         paddingLeft:width*0.05,
         paddingRight:width*0.05,
+        // marginBottom:30
     },
     info: {
         // borderBottomColor:'#CCCCCC',
@@ -732,6 +741,7 @@ const styles=StyleSheet.create({
         flexDirection:'row',
         paddingBottom:5,
         marginBottom:20,
+        // flex:1
     },
     input: {
         // marginLeft:width*0.4,
@@ -754,6 +764,7 @@ const styles=StyleSheet.create({
         paddingTop:12,
         paddingBottom:12,
         borderRadius:5,
+        marginBottom:50
     },
     cellView:{
         width:width*0.25,

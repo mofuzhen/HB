@@ -67,11 +67,14 @@ export default class ComponentInfo extends Component{
     // }
     render(){
         const {signId,status_fixed,category}=this.props
-        console.log(status_fixed)
+        // console.log(status_fixed)
         const InfoData=this.props.data
         const order_allData=this.props.order_allData;
-        console.log(order_allData)
-        console.log(this.props.data)
+        // console.log(order_allData)
+        // console.log(this.props.data)
+        const {auctions}=this.props
+        const imageArr=this.props.auctions.imgList
+        console.log(imageArr)
         return (
             <View style={styles.dispose_Info}>
                 <View style={{flexDirection:'row'}}>
@@ -93,7 +96,7 @@ export default class ComponentInfo extends Component{
                     {this.startService(signId,status_fixed,category)}
                 </View>
                 <Text style={styles.infomation_item}>
-                    成交价格：￥{order_allData.price}
+                    成交价格：￥{auctions.sprice}
                 </Text>
                 <View style={styles.userInfo}>
                     <Text style={styles.username}>
@@ -111,7 +114,7 @@ export default class ComponentInfo extends Component{
                         style={styles.infomation}
                         numberOfLines={2}
                     >
-                        {InfoData.introduction}
+                        {auctions.introduction}
                     </Text>
                 </View>  
                 
@@ -120,10 +123,11 @@ export default class ComponentInfo extends Component{
                         相关图片：
                     </Text>
                     <View style={{flex:1,flexDirection:'row',flexWrap:"wrap"}}>
-                        {/* {imageArr.map((item,index)=>{
-                            const  image_item='http://39.104.72.185:7001'+item
+                        {imageArr.map((item,index)=>{
+                            const  image_item='http://39.104.72.185:7001'+item.url
+                            console.log(image_item)
                             return(
-                                <View style={{marginLeft:5,marginTop:4}} key={index}>
+                                <View style={{marginLeft:5,marginTop:2}} key={index}>
                                     <Image 
                                         style={{width:width*0.135,height:width*0.135,borderWidth:1}}
                                         source={{uri:image_item}}
@@ -131,10 +135,7 @@ export default class ComponentInfo extends Component{
                                 </View>
                             )
                          })
-                        } */}
-                        <View style={{marginLeft:5,marginTop:4}}>
-                            <Image style={{width:width*0.135,height:width*0.135,borderWidth:1}}/>
-                        </View>
+                        }
                         {/* <View style={{marginLeft:5,marginTop:4}}>
                             <Image style={{width:width*0.135,height:width*0.135,borderWidth:1}}/>
                         </View> */}
@@ -149,7 +150,8 @@ export default class ComponentInfo extends Component{
 const styles=StyleSheet.create({
     dispose_Info: {
         marginTop:30,
-        paddingLeft:width*0.05
+        paddingLeft:width*0.05,
+        marginBottom:20
     },
     componentName: {
         fontSize:16,
@@ -165,11 +167,12 @@ const styles=StyleSheet.create({
     service: {
         position:'absolute',
         right:0,
-        fontSize:15,
+        fontSize:14,
         color:'#333333',
         fontWeight:'bold',
         marginLeft:2,
-        width:(width-width*0.05*2-width*0.4-70)
+        width:(width-width*0.05*2-width*0.4-70),
+        textAlign:'center'
     },
     first_button: {
         paddingTop:5,

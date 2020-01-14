@@ -12,6 +12,7 @@ export default class BusinessList extends Component{
             componentData:{}, //公司信息
             logos:'', //公司logo
             show:true, //点击显示,
+            icon:''
         };
         this.handleInputHidden=this.handleInputHidden.bind(this);
         // this.onshow=this.onshow.bind(this)
@@ -57,10 +58,11 @@ export default class BusinessList extends Component{
         })
     }
     componentDidMount(){
-        var {id,name,logos}=this.props.navigation.state.params
+        var {id,name,logos,icon}=this.props.navigation.state.params
         console.log(id,name)
         this.setState({
-            logos:logos
+            logos:logos,
+            icon:icon
         })
         this.getInfo(id,name)
     }
@@ -125,7 +127,7 @@ export default class BusinessList extends Component{
                                 
                                 componentData.imgList&&componentData.imgList.map((item,index)=>{
                                     console.log(item)
-                                    const url='http://39.104.72.185:7001'+item.url
+                                    const url='http://39.100.51.78:7001'+item.url
                                     
                                     return(
                                         <TouchableOpacity key={index} onPress={this.handleClick.bind(this,componentData)}>

@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import {View,Text,StyleSheet,Dimensions,ScrollView,TouchableOpacity} from 'react-native'
+import {View,Text,StyleSheet,Dimensions,ScrollView,TouchableOpacity,Alert,DeviceEventEmitter} from 'react-native'
 import { Icon, Steps, WingBlank } from '@ant-design/react-native';
 import { Geolocation,init,start,stop  } from "react-native-amap-geolocation";
 import WebView from 'react-native-webview'
@@ -17,7 +17,7 @@ export default class Tracing extends Component{
             step:this.props.step,
             step:{},
             serviceTabs:this.props.serviceTabs,
-            service_Id:this.props.service_Id, //点击切换服务单tabs即选择的id
+            service_Id:this.props.service_Id, //服务单tabs即选择的id
             ss_id:this.props.ss_id,//服务单首个id
             // step_all:this.props.step_all,
             // is_finish:1 //某节点是否完成
@@ -26,7 +26,9 @@ export default class Tracing extends Component{
             form:[], //当前节点的form内容
             name:'', //节点名称
             latitude:1, //纬度
-            longitude:1 //经度
+            longitude:1, //经度
+            service_status:this.props.service_status, //服务单最新状态
+            service_data:this.props.service_data
         }
      
     }
@@ -44,7 +46,9 @@ export default class Tracing extends Component{
             name:nextProps.name,
             form:nextProps.form,
             follow_id:nextProps.follow_id,
-            service_Id:nextProps.service_Id
+            service_Id:nextProps.service_Id,
+            service_status:nextProps.service_status,
+            service_data:nextProps.service_data
         })    
       }
     geolocationInit = async () => {
@@ -65,10 +69,8 @@ export default class Tracing extends Component{
         
         Geolocation.addLocationListener(location => {
             console.log(location);
-        });
-        
+        });   
         start();
-        
         stop();
     }
 
@@ -153,51 +155,172 @@ export default class Tracing extends Component{
         const step=res.data.step;
         this.setState({
             step_A:step
+            })
         })
-    })
-    .catch(err=>{
-        console.log(err)
-    }) 
-
+        .catch(err=>{
+            console.log(err)
+        })  
         
+        // //添加节点时间（订单生成、生成服务单）
+        // const steps1=this.props.steps1;
+        // console.log(steps1)
+        // // steps1.push({desc:'122121'})
+        // steps1[0]['desc']='2012-1-2';
+        // steps1[1]['desc']='2018-1-2';
     }  
+    //确定取消服务单
+    button_sure=()=>{
+        const service_Id=this.state.service_Id;
+        requests.post('/gzapi/service/update?',{
+            id:service_Id,
+            status:4
+         }).then(res=>{
+            console.log(res)
+            Alert.alert(
+                '取消成功',
+                [
+                  {text: '确定'}
+                ],
+                { cancelable: false }
+              )
+            DeviceEventEmitter.emit('key');
+        })
+    }
+    //取消
+    handleCancel(){
+        Alert.alert(
+            '确定取消该服务单吗?',
+            '',
+            [
+              {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: '确定', onPress: this.button_sure},
+            ],
+            { cancelable: false }
+          )
+        // Alert.alert(
+        //     '确定取消该服务单吗?',
+        //     [
+        //         {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+        //         {text: 'OK', onPress: () => console.log('取消成功')},
+        //       ],
+        //       { cancelable: false }
+        // )
+    }
+    getNewStatus=()=>{
+        const {service_status}=this.state;
+        if(service_status==1){
+            return '生成服务单'
+        }
+        if(service_status==2){
+            return '处理中'
+        }
+        if(service_status==3){
+            return '完成'
+        }
+        if(service_status==4){
+            return '已取消'
+        }
+    }
+    //设置、取消、完成、处理、已取消
+    handleEvent=()=>{
+        const {service_status,service_all}=this.state;
+        if(service_status==1){
+            return(
+                <View style={{flexDirection:'row',justifyContent:'space-between',paddingRight:width*0.05}}>
+                    <Text style={styles.text}>
+                        最新状态：{this.getNewStatus()}
+                    </Text>
+                    <Text 
+                        style={styles.button}
+                        onPress={()=>this.handleSet(service_all)}
+                        >   
+                        设置
+                    </Text>
+                    <Text 
+                        style={styles.cancel}
+                        onPress={this.handleCancel.bind(this)}
+                        >   
+                        取消
+                    </Text>
+                </View>
+            )
+        }
+        if(service_status==2){
+            return(
+                <View style={{flexDirection:'row',justifyContent:'space-between',paddingRight:width*0.05}}>
+                    <Text style={styles.text}>
+                        最新状态：{this.getNewStatus()}
+                    </Text>
+                    <Text 
+                        style={styles.button}
+                        onPress={()=>this.handleSet(service_all)}
+                        >   
+                        设置
+                    </Text>
+                </View>
+            )
+        }
+        if(service_status==3){
+            return(
+                <View style={{flexDirection:'row',justifyContent:'space-between',paddingRight:width*0.05}}>
+                    <Text style={styles.text}>
+                        最新状态：{this.getNewStatus()}
+                    </Text>
+                    <Text 
+                       style={styles.isCancel}
+                        >   
+                        完成
+                    </Text>
+                </View>
+            )
+        }
+        if(service_status==4){
+            return(
+                <View style={{flexDirection:'row',justifyContent:'space-between',paddingRight:width*0.05}}>
+                    <Text style={styles.text}>
+                        最新状态：{this.getNewStatus()}
+                    </Text>
+                    <Text 
+                        style={styles.isCancel}
+                        >   
+                        已取消
+                    </Text>
+                </View>
+            )
+        }
+    }
     render(){
-        console.log(this.state.service_Id)
-        console.log(this.state.longitude)
-        console.log(this.state.latitude)
+        // console.log(this.state.service_Id)
+        // console.log(this.state.longitude)
+        // console.log(this.state.latitude)
         const service_all =this.state.service_all;
-        console.log(service_all);   
+        // console.log(service_all);   
         // const steps1=this.state.step;
         // console.log(steps1);
-        console.log(this.props.steps1)
+        // console.log(this.props.steps1)
         // const {is_finish}=this.state
         // console.log(is_finish)
+        // const {p_name,c_name,a_name}=this.props.point;
+        const {p_name,c_name,a_name} =this.props.auctions.pointMap[0].point;
         return(
                 <View style={styles.tracing}>
                 <View style={styles.tracing_context}> 
-                    <View style={{flexDirection:'row',justifyContent:'space-between',paddingRight:width*0.05}}>
-                        <Text style={styles.text}>
-                            最新状态：开始处置
-                        </Text>
+                    {this.handleEvent()}
+                    <Text style={styles.text_item}>
+                        处置商品：{this.props.shop_name}
+                    </Text>
+                    <Text style={styles.text_item}>
+                        处置地点：{p_name} {c_name} {a_name}
+                    </Text>
+                    {/* {
+                        this.state.is_cancel?
                         <Text 
-                            style={styles.button}
-                            onPress={()=>this.handleSet(service_all)}
+                            style={styles.cancel}
+                            onPress={this.handleCancel.bind(this)}
                             >   
-                            设置
-                        </Text>
-                    </View>
-                    <Text style={styles.text}>
-                        处置企业：
-                    </Text>
-                    <Text style={styles.text}>
-                        处置商品：
-                    </Text>
-                    <Text style={styles.text}>
-                        处置地点：
-                    </Text>
-                    <Text style={styles.text}>
-                        处置方式：
-                    </Text>
+                            取消
+                        </Text>:null
+                    } */}
                 </View>
                 <View style={{position:'relative'}}>
                     
@@ -210,17 +333,19 @@ export default class Tracing extends Component{
                             <View style={{ marginTop: 30}}>
                                 <WingBlank size="lg">
                                     <Steps size="lg">
+                                    
                                         {this.props.steps1.map((item, index) => (
+                                            
                                             <Step
                                             key={index}
                                             title={
                                                 <View>
-                                                <Text>title:{item.name}</Text>
+                                                <Text>{item.name}</Text>
                                                 </View>
                                             }
                                             description={
                                                 <View>
-                                                <Text>desc:</Text>
+                                                <Text>{item.desc}</Text>
                                                 </View>
                                             }
                                             status={item.status}
@@ -263,9 +388,15 @@ const styles=StyleSheet.create({
         borderBottomColor:'#CCCCCC',
         borderBottomWidth:1,     
         paddingLeft:width*0.06,
+        // position:'relative'
     },
     text: {
         marginTop:10,
+        // paddingTop:4,
+         marginBottom:-4
+    },
+    text_item:{
+        marginTop:16,
         // paddingTop:4,
          marginBottom:-4
     },
@@ -273,12 +404,46 @@ const styles=StyleSheet.create({
         marginBottom:-12,
         marginTop:10,
         color:'white',
-        paddingLeft:25,
-        paddingRight:25,
+        paddingLeft:20,
+        paddingRight:20,
         paddingTop:3,
         paddingBottom:3,
         backgroundColor:'rgb(90, 162, 70)',
         borderRadius:5,
-        fontSize:16
+        fontSize:15,
+        position:'relative'
+    },
+    cancel:{
+        paddingLeft:18,
+        paddingRight:18,
+        paddingTop:3,
+        paddingBottom:3,
+        borderRadius:5,
+        borderColor:'rgb(90, 162, 70)',
+        borderWidth:1,
+        fontSize:15,
+        position:'absolute',
+        right:width*0.05,
+        color:'rgb(90, 162, 70)',
+        // top:50,
+        bottom:-50,
+        zIndex:999
+    },
+    isCancel:{
+        marginBottom:-12,
+        marginTop:10,
+        color:'rgba(0,0,0,.25)',
+        // paddingLeft:20,
+        // paddingRight:20,
+        paddingTop:3,
+        paddingBottom:3,
+        backgroundColor:'#f5f5f5',
+        borderRadius:5,
+        borderWidth:1,
+        borderColor:'#d9d9d9',
+        fontSize:15,
+        width:width*0.18,
+        textAlign:'center'
     }
 })
+

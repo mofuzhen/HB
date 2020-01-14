@@ -1,7 +1,7 @@
 import axios from 'axios';
 // import AsyncStorage from '@react-native-community/async-storage';
 // import {_retrieveData} from './AsyncStorage'
-import {AsyncStorage,Alert} from 'react-native'
+import {AsyncStorage} from 'react-native'
 
   
 // const instance = axios.create({
@@ -13,9 +13,10 @@ import {AsyncStorage,Alert} from 'react-native'
 //     }
 // });
 
-axios.defaults.baseURL = 'http://39.104.72.185:7001'
+// axios.defaults.baseURL = 'http://39.104.72.185:7001'  //测试IP
+axios.defaults.baseURL = 'http://39.100.51.78:7001'      //UAT IP
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8'
-// 'token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiIiLCJtb2JpbGUiOiI1IiwiaWF0IjoxNTYzODY1MjMyfQ.vV6a-gNRtFmjeWV-Azq130YOJv5R2VLy6VF-eoOg-2g'
+
 
 export const _retrieveData = async (key) => {
     try {
@@ -74,7 +75,7 @@ axios.interceptors.response.use(response => {
     const res = response.data
     if (res.code === 10005) { // 没有token
         // showToast(res.message,1500);
-        alert('没有token')
+        // alert('没有token')
     }
     console.log(res);
     return res

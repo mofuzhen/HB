@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import {View,Text,StyleSheet,Dimensions,TextInput,Alert} from 'react-native'
+import {View,Text,StyleSheet,Dimensions,TextInput,Alert,Platform} from 'react-native'
 const {width} =Dimensions.get('window')
 import {requests} from '../../../http'
 import { TouchableOpacity } from 'react-native-gesture-handler'
@@ -31,7 +31,7 @@ export default class ComponentInfo extends Component{
             const {code}=res
             if(code===0){
                 // Alert.alert('请求成功')
-                this.props.navigate('details')
+                // this.props.navigate('details')
             }else {
                 Alert.alert('请求失败')
             }

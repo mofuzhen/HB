@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {Text,View,StyleSheet,Image,Dimensions,ScrollView,TouchableOpacity} from 'react-native'
+import {Text,View,StyleSheet,Image,Dimensions,ScrollView,DeviceEventEmitter,TouchableOpacity} from 'react-native'
 import OrderList from "../../../component/orderList"
 import {requests} from '../../../http'
 
@@ -33,7 +33,8 @@ export default class Order extends Component{
             ],
             listData:[],  //订单内容,
             name:'',    //公司名称
-            logos:''    //公司logo
+            logos:'',    //公司logo
+            icon:''     //个人头像
         }
     }
     // handleChangeInfo(categ ory){
@@ -71,7 +72,7 @@ export default class Order extends Component{
         requests.get(`/gzapi/order/list?status=${item.status}&companyId=${id}`).then(res=>{
             const detailsData=res.data.rows
             console.log(detailsData)
-
+            
             // for(let item of detailsData) {
             //     let status_fixed=item.status;
             //     let status_sign=item.auction.status;
@@ -108,6 +109,7 @@ export default class Order extends Component{
     }   
     返回上一页
     goHome(){   
+        this.props.navigation.state.params.refresh();
         this.props.navigation.navigate('businessList')
     }
     getOrderData(id){
@@ -141,18 +143,27 @@ export default class Order extends Component{
             console.log(err);   
         })
     }
-    componentDidMount(){    
+    componentWillUnmount(){
+        this.subscription.remove();
+    }
+    componentDidMount(){
+        
         // console.log(this.state.status)
-        var {id,category,name,logos}=this.props.navigation.state.params
+        var {id,category,name,logos,icon}=this.props.navigation.state.params
         console.log(id,category)
         this.setState({
             id:id,
             category:category,
             name:name,
-            logos:logos
+            logos:logos,
+            icon:icon
         })
         console.log(category,name,logos,id)
        this.getOrderData(id)
+       //监听页面
+        this.subscription=DeviceEventEmitter.addListener('change',(params)=>{
+            this.getOrderData(id)
+        })
     }
     render(){
         // console.log(this.state.status_fixed)
@@ -175,7 +186,7 @@ export default class Order extends Component{
                         <View style={styles.texts}>
                             <Image 
                                 style={styles.username} 
-                                source={{uri:'http://39.104.72.185:7001/public/upload/img/1571757966042.png'}}
+                                source={{uri:this.state.icon}}
                             />
                             <View style={{marginBottom:5}}>
                                 <Text style={styles.text}>Nick</Text>

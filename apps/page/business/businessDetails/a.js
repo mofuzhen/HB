@@ -22,7 +22,7 @@ export default class A extends Component{
     getimgs(componentData){
         let imgs=[];
         for(let i=0;i<componentData.imgList.length;i++){
-            const url='http://39.104.72.185:7001'+componentData.imgList[i].url
+            const url='http://39.100.51.78:7001'+componentData.imgList[i].url
             console.log(url)
             imgs.push(url) 
             // console.log(imgs) 
