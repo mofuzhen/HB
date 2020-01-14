@@ -322,8 +322,7 @@ export default class Tracing extends Component{
                         </Text>:null
                     } */}
                 </View>
-                <View style={{position:'relative'}}>
-                    
+                <View style={{position:'relative',flex:1}}>
                         <ScrollView
                             automaticallyAdjustContentInsets={false}
                             showsHorizontalScrollIndicator={false}
@@ -360,10 +359,10 @@ export default class Tracing extends Component{
                             style={{position:'absolute',right:width*0.06,top:height*0.05}}>
                             <Text 
                             style={{
-                                    fontSize:15,borderWidth:1,padding:5,borderTopLeftRadius:30,
-                                    borderBottomLeftRadius:30,borderTopRightRadius:30,
-                                    borderBottomRightRadius:30,width:75,textAlign:'center',
-                                    
+                                    fontSize:15,borderWidth:1,padding:5,borderTopLeftRadius:width*0.068,
+                                    borderBottomLeftRadius:width*0.068,borderTopRightRadius:width*0.068,
+                                    borderBottomRightRadius:width*0.068,width:width*0.2,textAlign:'center',
+                                    overflow: 'hidden'
                                 }}
                                 onPress={this.handleMaps.bind(this)}
                             >
@@ -404,20 +403,21 @@ const styles=StyleSheet.create({
         marginBottom:-12,
         marginTop:10,
         color:'white',
-        paddingLeft:20,
-        paddingRight:20,
-        paddingTop:3,
-        paddingBottom:3,
+        paddingLeft:width*0.056,
+        paddingRight:width*0.056,
+        // paddingRight:20,
+        paddingTop:width*0.01,
+        paddingBottom:width*0.01,
         backgroundColor:'rgb(90, 162, 70)',
         borderRadius:5,
         fontSize:15,
         position:'relative'
     },
     cancel:{
-        paddingLeft:18,
-        paddingRight:18,
-        paddingTop:3,
-        paddingBottom:3,
+        paddingLeft:width*0.05,
+        paddingRight:width*0.05,
+        paddingTop:width*0.01,
+        paddingBottom:width*0.01,
         borderRadius:5,
         borderColor:'rgb(90, 162, 70)',
         borderWidth:1,

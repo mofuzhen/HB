@@ -852,10 +852,10 @@ const styles=StyleSheet.create({
         fontWeight:'bold'
     },  
     first_button: {
-        paddingTop:5,
-        paddingBottom:5,
-        paddingLeft:7,
-        paddingRight:7,
+        paddingTop:width*0.015,
+        paddingBottom:width*0.015,
+        paddingLeft:width*0.019,
+        paddingRight:width*0.019,
         backgroundColor:"#5AA246",
         color:'white',
         position:'absolute',
